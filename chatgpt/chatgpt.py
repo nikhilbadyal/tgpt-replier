@@ -1,9 +1,11 @@
 """Auth Open API."""
-from typing import Dict, List
+from typing import Any, Dict, List, Tuple
 
 import openai
 from loguru import logger
 from telethon.tl.types import User
+
+from chatgpt.utils import UserType
 
 
 class ChatGPT(object):
@@ -19,16 +21,20 @@ class ChatGPT(object):
 
         openai.api_key = env.str("GPT_KEY")
 
+    def build_message(self, result: List[Tuple[Any, ...]]) -> List[Dict[str, str]]:
+        """Build Open API message."""
+        messages = [{"role": "system", "content": "You are a helpful assistant."}]
+        messages += [{"role": row[0], "content": row[1]} for row in result]
+
+        return messages
+
     def chat(self, user: User, message: str) -> str:
         """Chat Open API."""
-        if user.username not in self.message_history:
-            logger.info(
-                "No message history found for the user {}".format(user.username)
-            )
-            self.message_history[user.username] = [
-                {"role": "system", "content": "You are a helpful assistant."}
-            ]
-        self.message_history[user.username].append({"role": "user", "content": message})
+        from main import db
+
+        db.insert_message_from_user(message, user.id)
+        messages = db.get_messages_by_user(user)
+        self.message_history[user.username] = self.build_message(messages)
         response = openai.ChatCompletion.create(  # type: ignore
             model="gpt-3.5-turbo",
             messages=self.message_history[user.username],
@@ -36,7 +42,8 @@ class ChatGPT(object):
         )
         logger.debug("Got response fromm open AI")
         reply = str(response["choices"][0]["message"]["content"])
+        db.insert_message_from_gpt(reply, user.id)
         self.message_history[user.username].append(
-            {"role": "assistant", "content": reply}
+            {"role": UserType.ASSISTANT.value, "content": reply}
         )
         return reply
