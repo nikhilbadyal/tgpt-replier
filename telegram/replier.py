@@ -2,6 +2,7 @@
 
 from loguru import logger
 from telethon import TelegramClient, events
+from telethon.tl.types import User
 
 from chatgpt.chatgpt import ChatGPT
 
@@ -30,11 +31,13 @@ class Telegram(object):
             """Handle Incoming Message."""
             if event.is_private:  # only auto-reply to private chats
                 try:
-                    from_ = await event.client.get_entity(event.from_id)
+                    from_: User = await event.client.get_entity(event.from_id)
+                    user = from_.username.lower()
                 except ValueError:
                     from_ = await event.get_sender()
+                    user = from_.username.lower()
                 if from_ and not from_.bot:
-                    await event.respond(gpt.chat(event.message.text))
+                    await event.respond(gpt.chat(user, event.message.text))
                 else:
                     logger.error("Cannot get Entity or a bot")
             else:
