@@ -11,7 +11,7 @@ class SQLiteDatabase(object):
     """SQLite database Object."""
 
     def __init__(self) -> None:
-        self.connection = sqlite3.connect("tgreplier.db")
+        self.connection = sqlite3.connect("tgpt-replier.db")
         self.create_table()
 
     def create_table(self) -> None:
