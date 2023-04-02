@@ -1,5 +1,8 @@
 """Reply to messages."""
+import io
+from typing import IO, Union
 
+import requests
 from loguru import logger
 from telethon import TelegramClient, events
 from telethon.tl.types import User
@@ -23,6 +26,31 @@ class Telegram(object):
         logger.info("Auto-replying...")
         self.client.start(env.int("PHONE"), env.str("2FA_PASSWORD"))
 
+    async def send_file(self, file: Union[bytes, IO[bytes]], caption: str) -> None:
+        """Sends a file to the 'me' chat in Telegram with the specified
+        caption.
+
+        :param file: The file to send.
+        :param caption: The caption for the file.
+        """
+
+        file_handle = io.BytesIO(file) if isinstance(file, bytes) else file
+        await self.client.send_file("me", file_handle, caption=caption)
+
+    async def send_image_from_url(self, user: User, url: str, caption: str) -> None:
+        """Downloads an image from a URL and sends it to the user in Telegram
+        with the specified caption.
+
+        :param user:
+        :type user: User Entity
+        :param url: The URL of the image to download.
+        :param caption: The caption for the image.
+        """
+
+        response = requests.get(url)
+        file_bytes = response.content
+        await self.client.send_file(entity=user, file=file_bytes, caption=caption)
+
     def listen(self, gpt: ChatGPT) -> None:
         """Listen for messages."""
 
@@ -36,7 +64,15 @@ class Telegram(object):
                 except ValueError:
                     user = await event.get_sender()
                 if user and not user.bot:
-                    await event.respond(gpt.chat(user, event.message.text))
+                    image_prefix = "/image"
+                    if image_prefix in event.message.text:
+                        result = event.message.text[len(image_prefix) :]
+                        await self.send_image_from_url(
+                            user, gpt.image_gen(result), result
+                        )
+                    else:
+                        await event.respond(gpt.chat(user, event.message.text))
+
                 else:
                     logger.error("Cannot get Entity or a bot")
             else:

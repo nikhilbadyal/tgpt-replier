@@ -47,3 +47,10 @@ class ChatGPT(object):
             {"role": UserType.ASSISTANT.value, "content": reply}
         )
         return reply
+
+    def image_gen(self, message: str) -> str:
+        """Generate an image from the text."""
+        response = openai.Image.create(prompt=message, n=1, size="1024x1024")  # type: ignore
+        image_url = str(response["data"][0]["url"])
+        logger.info("Image URL: %s" % image_url)
+        return image_url
