@@ -18,20 +18,26 @@ class Telegram(object):
         from main import env
 
         self.client: TelegramClient = TelegramClient(
-            session_file,
+            "tests",
             env.int("API_ID"),
             env.str("API_HASH"),
             sequential_updates=True,
         )
         logger.info("Auto-replying...")
         if env.str("BOT_TOKEN", None):
+            bot = True
             logger.debug("Trying to connect using bot token")
             self.client.start(bot_token=env.str("BOT_TOKEN"))
         else:
+            bot = False
             logger.debug("Trying to connect using phone & 2FA")
             self.client.start(env.int("PHONE"), env.str("TWOFA_PASSWORD"))
         if self.client.is_connected():
             logger.info("Connected to Telegram")
+            if bot:
+                logger.info(
+                    "You are using bot authentication. Only messages sent to bot will be acknowledged."
+                )
         else:
             logger.info("Unable to connect with Telegram exiting.")
             exit(1)
