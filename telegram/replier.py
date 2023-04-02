@@ -70,8 +70,10 @@ class Telegram(object):
                         await self.send_image_from_url(
                             user, gpt.image_gen(result), result
                         )
-                    else:
+                    elif event.message.text:
                         await event.respond(gpt.chat(user, event.message.text))
+                    else:
+                        await event.respond("Only messages supported.")
 
                 else:
                     logger.error("Cannot get Entity or a bot")
