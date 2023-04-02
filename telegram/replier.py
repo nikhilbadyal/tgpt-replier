@@ -18,7 +18,7 @@ class Telegram(object):
         from main import env
 
         self.client: TelegramClient = TelegramClient(
-            "tests",
+            session_file,
             env.int("API_ID"),
             env.str("API_HASH"),
             sequential_updates=True,
