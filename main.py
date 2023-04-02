@@ -10,4 +10,4 @@ db = SQLiteDatabase()
 
 if __name__ == "__main__":
     gpt = ChatGPT()
-    Telegram("nikhilbadyal").listen(gpt)
+    Telegram("tgpt-replier").listen(gpt)
