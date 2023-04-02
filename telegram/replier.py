@@ -24,7 +24,7 @@ class Telegram(object):
             sequential_updates=True,
         )
         logger.info("Auto-replying...")
-        self.client.start(env.int("PHONE"), env.str("2FA_PASSWORD"))
+        self.client.start(env.int("PHONE"), env.str("TWOFA_PASSWORD"))
 
     async def send_file(self, file: Union[bytes, IO[bytes]], caption: str) -> None:
         """Sends a file to the 'me' chat in Telegram with the specified
