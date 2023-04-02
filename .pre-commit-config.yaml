@@ -60,4 +60,4 @@ repos:
         args:
           - '--strict'
           - '--config=setup.cfg'
-        additional_dependencies: [ openai ]
+        additional_dependencies: [ openai,types-requests ]
