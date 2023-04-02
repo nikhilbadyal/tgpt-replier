@@ -24,7 +24,17 @@ class Telegram(object):
             sequential_updates=True,
         )
         logger.info("Auto-replying...")
-        self.client.start(env.int("PHONE"), env.str("TWOFA_PASSWORD"))
+        if env.str("BOT_TOKEN", None):
+            logger.debug("Trying to connect using bot token")
+            self.client.start(bot_token=env.str("BOT_TOKEN"))
+        else:
+            logger.debug("Trying to connect using phone & 2FA")
+            self.client.start(env.int("PHONE"), env.str("TWOFA_PASSWORD"))
+        if self.client.is_connected():
+            logger.info("Connected to Telegram")
+        else:
+            logger.info("Unable to connect with Telegram exiting.")
+            exit(1)
 
     async def send_file(self, file: Union[bytes, IO[bytes]], caption: str) -> None:
         """Sends a file to the 'me' chat in Telegram with the specified
