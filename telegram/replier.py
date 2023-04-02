@@ -57,10 +57,10 @@ class Telegram(object):
         @self.client.on(events.NewMessage(incoming=True))  # type: ignore
         async def handle_new_message(event: events.NewMessage.Event) -> None:
             """Handle Incoming Message."""
-            logger.debug("Received new message")
+            logger.debug("Received new event {}".format(event))
             if event.is_private:  # only auto-reply to private chats
                 try:
-                    user: User = await event.client.get_entity(event.from_id)
+                    user: User = await event.client.get_entity(event.peer_id)
                 except ValueError:
                     user = await event.get_sender()
                 if user and not user.bot:
