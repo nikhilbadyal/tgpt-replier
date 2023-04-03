@@ -10,4 +10,7 @@ env.read_env()
 db = SQLiteDatabase(project_name)
 if __name__ == "__main__":
     gpt = ChatGPT()
-    Telegram(project_name).listen(gpt)
+    if env.str("BOT_TOKEN", None):
+        Telegram(project_name).bot_listener(gpt)
+    else:
+        Telegram(project_name).private_listen(gpt)

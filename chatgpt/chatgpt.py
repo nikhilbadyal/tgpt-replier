@@ -28,12 +28,28 @@ class ChatGPT(object):
 
         return messages
 
+    def reply_start(self, message: str) -> str:
+        """Reply to start message."""
+
+        messages = [
+            {"role": "system", "content": "You are a helpful assistant."},
+            {"role": "user", "content": message},
+        ]
+        response = openai.ChatCompletion.create(  # type: ignore
+            model="gpt-3.5-turbo",
+            messages=messages,
+            timeout=10,
+        )
+        logger.debug("Got response fromm open AI")
+        reply = str(response["choices"][0]["message"]["content"])
+        return reply
+
     def chat(self, user: User, message: str) -> str:
         """Chat Open API."""
         from main import db
 
         db.insert_message_from_user(message, user.id)
-        messages = db.get_messages_by_user(user)
+        messages = db.get_messages_by_user(user.id)
         self.message_history[user.username] = self.build_message(messages)
         response = openai.ChatCompletion.create(  # type: ignore
             model="gpt-3.5-turbo",
@@ -48,9 +64,29 @@ class ChatGPT(object):
         )
         return reply
 
-    def image_gen(self, message: str) -> str:
+    def image_gen(self, user: User, message: str) -> str:
         """Generate an image from the text."""
-        response = openai.Image.create(prompt=message, n=1, size="1024x1024")  # type: ignore
+        response = openai.Image.create(prompt=message, n=1, size="512x512")  # type: ignore
         image_url = str(response["data"][0]["url"])
-        logger.info("Image URL: %s" % image_url)
+        from main import db
+
+        db.insert_images_from_gpt(message, image_url, user.id)
         return image_url
+
+    def clean_up_user_messages(self, user: User) -> bool:
+        """Delete all user's message data."""
+        from main import db
+
+        return db.delete_all_user_messages(user.id)
+
+    def clean_up_user_images(self, user: User) -> bool:
+        """Delete all user's image data."""
+        from main import db
+
+        return db.delete_all_user_messages(user.id)
+
+    def clean_up_user_data(self, user: User) -> bool:
+        """Delete all for a user data."""
+        from main import db
+
+        return db.delete_all_user_data(user.id)
