@@ -23,6 +23,7 @@ class SQLiteDatabase(object):
           message TEXT,
           role text,
           is_bot_message BOOLEAN,
+          conversation_id text,
           message_date DATETIME DEFAULT CURRENT_TIMESTAMP
         );
         CREATE TABLE if not exists images (
@@ -31,6 +32,7 @@ class SQLiteDatabase(object):
           image_caption TEXT,
           image_url TEXT,
           is_bot_image BOOLEAN,
+          conversation_id text,
           message_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         );
         """
