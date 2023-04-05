@@ -24,7 +24,13 @@ class ChatGPT(object):
     def build_message(self, result: List[Tuple[Any, ...]]) -> List[Dict[str, str]]:
         """Build Open API message."""
         messages = [{"role": "system", "content": "You are a helpful assistant."}]
-        messages += [{"role": row[0], "content": row[1]} for row in result]
+        messages += [
+            {
+                "role": UserType.ASSISTANT.value if row[0] else UserType.USER.value,
+                "content": row[1],
+            }
+            for row in result
+        ]
 
         return messages
 
