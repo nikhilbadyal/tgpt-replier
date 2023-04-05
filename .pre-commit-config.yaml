@@ -1,4 +1,4 @@
-exclude: "^venv/"
+exclude: "^venv/|/migrations/"
 default_stages: [ commit ]
 
 repos:
