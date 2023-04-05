@@ -7,7 +7,7 @@ from telegram.replier import Telegram
 project_name = "tgpt-replier"
 env = Env()
 env.read_env()
-db = SQLiteDatabase(project_name)
+db = SQLiteDatabase()
 if __name__ == "__main__":
     gpt = ChatGPT()
     if env.str("BOT_TOKEN", None):

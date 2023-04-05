@@ -3,6 +3,7 @@ import io
 from typing import IO, Union
 
 import requests
+from asgiref.sync import sync_to_async
 from loguru import logger
 from telethon import TelegramClient, events
 from telethon.tl.types import User
@@ -130,20 +131,20 @@ class Telegram(object):
         async def handle_image_command(event: events.NewMessage.Event) -> None:
             """Handle Start Message."""
             prefix = "/image "
-            user: User = await self.get_user(event)
+            telegram_user: User = await self.get_user(event)
             result = event.message.text[len(prefix) :]
             if result:
-                await self.send_image_from_url(
-                    user, gpt.image_gen(user, result), result
-                )
+                url = await sync_to_async(gpt.image_gen)(telegram_user, result)
+                await self.send_image_from_url(telegram_user, url, result)
             else:
                 await event.respond(self.no_input)
 
         @self.client.on(events.NewMessage(pattern="/resetmessages"))  # type: ignore
         async def handle_reset_messages_command(event: events.NewMessage.Event) -> None:
             """Delete all message history for a user."""
-            user: User = await self.get_user(event)
-            if gpt.clean_up_user_messages(user):
+            telegram_user: User = await self.get_user(event)
+            result = await sync_to_async(gpt.clean_up_user_messages)(telegram_user)
+            if result:
                 await event.respond(self.cleanup_success)
             else:
                 await event.respond(self.cleanup_failure)
@@ -151,8 +152,9 @@ class Telegram(object):
         @self.client.on(events.NewMessage(pattern="/resetimages"))  # type: ignore
         async def handle_reset_images_command(event: events.NewMessage.Event) -> None:
             """Delete all message history for a user."""
-            user: User = await self.get_user(event)
-            if gpt.clean_up_user_images(user):
+            telegram_user: User = await self.get_user(event)
+            result = await sync_to_async(gpt.clean_up_user_images)(telegram_user)
+            if result:
                 await event.respond(self.cleanup_success)
             else:
                 await event.respond(self.cleanup_failure)
@@ -160,8 +162,9 @@ class Telegram(object):
         @self.client.on(events.NewMessage(pattern="/reset"))  # type: ignore
         async def handle_reset_command(event: events.NewMessage.Event) -> None:
             """Delete all message history for a user."""
-            user: User = await self.get_user(event)
-            if gpt.clean_up_user_data(user):
+            telegram_user: User = await self.get_user(event)
+            result = await sync_to_async(gpt.clean_up_user_data)(telegram_user)
+            if result:
                 await event.respond(self.cleanup_success)
             else:
                 await event.respond(self.cleanup_failure)
@@ -173,7 +176,10 @@ class Telegram(object):
                 user: User = await self.get_user(event)
                 if user and not user.bot:
                     if event.message.text:
-                        await event.respond(gpt.chat(user, event.message.text))
+                        message = await sync_to_async(gpt.chat)(
+                            user, event.message.text
+                        )
+                        await event.respond(message)
                     else:
                         await event.respond(self.cleanup_failure)
                 else:
