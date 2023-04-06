@@ -18,12 +18,16 @@ class User(models.Model):
         id (int): The unique ID of the user.
         name (str or None): The name of the user, or None if no name was provided.
         telegram_id (int): The ID of the user.
+        joining_date (datetime): The date and time when the user was added to the database.
 
     Managers:
         objects (UserManager): The custom manager for this model.
 
     Meta:
         db_table (str): The name of the database table used to store this model's data.
+
+    Raises:
+        IntegrityError: If the user's Telegram ID is not unique.
     """
 
     # User ID, auto-generated primary key
@@ -33,7 +37,10 @@ class User(models.Model):
     name = models.CharField(max_length=255, null=True)
 
     # User Telegram ID, integer
-    telegram_id = models.IntegerField()
+    telegram_id = models.IntegerField(unique=True)
+
+    # Date and time when the user was added to the database, auto-generated
+    joining_date = models.DateTimeField(auto_now_add=True)
 
     # Use custom manager for this model
     objects = UserManager()
