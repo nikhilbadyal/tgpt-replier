@@ -1,5 +1,6 @@
 """Reply to messages."""
 import io
+import re
 from typing import IO, Union
 
 import requests
@@ -9,6 +10,7 @@ from telethon import TelegramClient, events
 from telethon.tl.types import User
 
 from chatgpt.chatgpt import ChatGPT
+from sqlitedb.utils import ErrorCodes
 
 
 class Telegram(object):
@@ -96,9 +98,11 @@ class Telegram(object):
                     image_prefix = "/image"
                     if image_prefix in event.message.text:
                         result = event.message.text[len(image_prefix) :]
-                        await self.send_image_from_url(
-                            user, gpt.image_gen(user, result), result
-                        )
+                        response = gpt.image_gen(user, result)
+                        if isinstance(response, int):
+                            await event.respond(self.cleanup_failure)
+                        else:
+                            await self.send_image_from_url(user, response, result)
                     elif event.message.text:
                         await event.respond(gpt.chat(user, event.message.text))
                     else:
@@ -123,6 +127,7 @@ class Telegram(object):
                 Give a funny pun. Add {prefix} before starting the pun. Dont add anything else to
                 result. Just {prefix} and pun
             """
+            logger.debug("Received pun request")
             reply = gpt.reply_start(start_message)
             result = reply[len(prefix) :]
             await event.respond(result)
@@ -130,56 +135,70 @@ class Telegram(object):
         @self.client.on(events.NewMessage(pattern="/image"))  # type: ignore
         async def handle_image_command(event: events.NewMessage.Event) -> None:
             """Handle Start Message."""
+            logger.debug("Received image request")
             prefix = "/image "
             telegram_user: User = await self.get_user(event)
             result = event.message.text[len(prefix) :]
             if result:
                 url = await sync_to_async(gpt.image_gen)(telegram_user, result)
+                if isinstance(url, int):
+                    await event.respond(self.cleanup_failure)
                 await self.send_image_from_url(telegram_user, url, result)
             else:
                 await event.respond(self.no_input)
 
-        @self.client.on(events.NewMessage(pattern="/resetmessages"))  # type: ignore
-        async def handle_reset_messages_command(event: events.NewMessage.Event) -> None:
-            """Delete all message history for a user."""
-            telegram_user: User = await self.get_user(event)
-            result = await sync_to_async(gpt.clean_up_user_messages)(telegram_user)
-            if result:
-                await event.respond(self.cleanup_success)
-            else:
-                await event.respond(self.cleanup_failure)
-
-        @self.client.on(events.NewMessage(pattern="/resetimages"))  # type: ignore
+        @self.client.on(events.NewMessage(pattern="^/reset(messages|images)$"))  # type: ignore
         async def handle_reset_images_command(event: events.NewMessage.Event) -> None:
             """Delete all message history for a user."""
             telegram_user: User = await self.get_user(event)
-            result = await sync_to_async(gpt.clean_up_user_images)(telegram_user)
-            if result:
-                await event.respond(self.cleanup_success)
-            else:
-                await event.respond(self.cleanup_failure)
+            original_message = event.message.text
+            match = re.search(r"^/reset(.+)$", original_message)
+            if match:
+                request = match.group(1)
+                logger.debug(f"Received request to delete all {request}")
+                result = await sync_to_async(gpt.clean_up_user_data)(
+                    original_message, telegram_user
+                )
+                logger.debug(f"Removed {result} {request}")
+                if result >= ErrorCodes.exceptions.value:
+                    await event.respond(self.cleanup_success)
+                else:
+                    await event.respond(self.cleanup_failure)
 
-        @self.client.on(events.NewMessage(pattern="/reset"))  # type: ignore
+        @self.client.on(events.NewMessage(pattern="^/reset$"))  # type: ignore
         async def handle_reset_command(event: events.NewMessage.Event) -> None:
             """Delete all message history for a user."""
+            logger.debug("Received request to delete all user data")
             telegram_user: User = await self.get_user(event)
-            result = await sync_to_async(gpt.clean_up_user_data)(telegram_user)
-            if result:
-                await event.respond(self.cleanup_success)
-            else:
+            num_conv_deleted, num_img_deleted = await sync_to_async(
+                gpt.clean_up_user_data
+            )("/reset", telegram_user)
+            logger.debug(
+                f"Removed {num_conv_deleted} convo and {num_img_deleted} images"
+            )
+            if (
+                num_conv_deleted <= ErrorCodes.exceptions.value
+                or num_img_deleted <= ErrorCodes.exceptions.value
+            ):
                 await event.respond(self.cleanup_failure)
+            await event.respond(self.cleanup_success)
 
         @self.client.on(events.NewMessage(pattern=self.get_regex()))  # type: ignore
         async def handle_any_message(event: events.NewMessage.Event) -> None:
             """Handle Start Message."""
+            logger.debug("Received request in general handler")
             if event.is_private:  # only auto-reply to private chats
                 user: User = await self.get_user(event)
                 if user and not user.bot:
                     if event.message.text:
+                        logger.debug("Sent request to OPENAI")
                         message = await sync_to_async(gpt.chat)(
                             user, event.message.text
                         )
-                        await event.respond(message)
+                        if isinstance(message, int):
+                            await event.respond(self.cleanup_failure)
+                        else:
+                            await event.respond(message)
                     else:
                         await event.respond(self.cleanup_failure)
                 else:

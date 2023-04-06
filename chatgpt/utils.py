@@ -7,3 +7,11 @@ class UserType(Enum):
 
     ASSISTANT = "assistant"
     USER = "user"
+
+
+class DataType(Enum):
+    """Data type."""
+
+    MESSAGES = "/resetmessages"
+    IMAGES = "/resetimages"
+    ALL = "/reset"
