@@ -64,6 +64,7 @@ class ChatGPT(object):
         if response <= ErrorCodes.exceptions.value:
             return response
         self.message_history[user.username] = self.build_message(messages)
+        logger.debug("Sent request to OPENAI")
         openapi_response = openai.ChatCompletion.create(  # type: ignore
             model="gpt-3.5-turbo",
             messages=self.message_history[user.username],

@@ -191,7 +191,6 @@ class Telegram(object):
                 user: User = await self.get_user(event)
                 if user and not user.bot:
                     if event.message.text:
-                        logger.debug("Sent request to OPENAI")
                         message = await sync_to_async(gpt.chat)(
                             user, event.message.text
                         )
