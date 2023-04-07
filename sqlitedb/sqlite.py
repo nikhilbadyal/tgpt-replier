@@ -208,3 +208,47 @@ class SQLiteDatabase(object):
             telegram_id
         ), self.delete_all_user_images(telegram_id)
         return num_conv_deleted, num_img_deleted
+
+    def initiate_new_conversation(self, telegram_id: int) -> int:
+        """Initiates a new conversation for a user by creating a new
+        Conversation object and a new CurrentConversation object.
+
+        Args:
+            telegram_id (int): The ID of the user for which to start a new conversation.
+
+        Returns:
+            ConversationResult: The result of the conversation creation operation.
+        """
+        try:
+            user = User.objects.get(telegram_id=telegram_id)
+        except User.DoesNotExist:
+            logger.error(f"User with ID {telegram_id} does not exist.")
+            return ErrorCodes.exceptions.value
+
+        conversation = Conversation(user=user)
+        try:
+            conversation.save()
+        except Exception as e:
+            logger.error(
+                f"An error occurred while saving conversation to the database: {e}"
+            )
+            return ErrorCodes.exceptions.value
+
+        try:
+            current_conversation = CurrentConversation.objects.get(user=user)
+            current_conversation.conversation = conversation
+        except CurrentConversation.DoesNotExist:
+            current_conversation = CurrentConversation(
+                user=user, conversation=conversation
+            )
+
+        try:
+            current_conversation.save()
+        except Exception as e:
+            logger.error(
+                f"An error occurred while saving current conversation to the database: {e}"
+            )
+            conversation.delete()
+            return ErrorCodes.exceptions.value
+
+        return ErrorCodes.success.value

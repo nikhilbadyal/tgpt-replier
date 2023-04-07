@@ -3,6 +3,7 @@ from typing import Dict, List, Tuple
 
 import openai
 from loguru import logger
+from openai.openai_object import OpenAIObject
 from telethon.tl.types import User
 
 from chatgpt.utils import DataType, UserType
@@ -125,3 +126,9 @@ class ChatGPT(object):
         else:
             logger.error("Not a valid choice")
             return -1, -1
+
+    def initiate_new_conversation(self, telegram_user: User) -> int:
+        """Initiate a new conversation."""
+        from main import db
+
+        return db.initiate_new_conversation(telegram_user.id)

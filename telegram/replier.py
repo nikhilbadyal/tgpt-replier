@@ -29,7 +29,14 @@ class Telegram(object):
         self.no_input = "Please provide valid input."
         self.cleanup_success = "Gone🧹"
         self.cleanup_failure = "Something bad happened.☠️"
-        self.block_list = ["start", "image", "resetmessages", "resetimages", "reset"]
+        self.block_list = [
+            "start",
+            "image",
+            "resetmessages",
+            "resetimages",
+            "reset",
+            "new",
+        ]
         logger.info("Auto-replying...")
         if env.str("BOT_TOKEN", None):
             bot = True
@@ -210,6 +217,19 @@ class Telegram(object):
                 and num_img_deleted > ErrorCodes.exceptions.value
             ):
                 await event.respond(self.cleanup_success)
+            else:
+                await event.respond(self.cleanup_failure)
+
+        @self.client.on(events.NewMessage(pattern="^/new$"))  # type: ignore
+        async def handle_new_command(event: events.NewMessage.Event) -> None:
+            """Create new conversation."""
+            logger.debug("Received request to initiate new conversation")
+            telegram_user: User = await self.get_user(event)
+            status = await sync_to_async(gpt.initiate_new_conversation)(telegram_user)
+            logger.debug(f"Initiated new conversation with id {status}")
+            success = "Initiated new conversation."
+            if status > ErrorCodes.exceptions.value:
+                await event.respond(success)
             else:
                 await event.respond(self.cleanup_failure)
 
