@@ -39,7 +39,7 @@ class ChatGPT(object):
         return messages
 
     def send_request(self, messages: List[Dict[str, str]]) -> int | OpenAIObject:
-        """"Send a request to OpenAI."""
+        """Send a request to OpenAI."""
         try:
             response: OpenAIObject = openai.ChatCompletion.create(  # type: ignore
                 model="gpt-3.5-turbo",
