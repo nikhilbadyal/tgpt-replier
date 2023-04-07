@@ -170,9 +170,7 @@ class SQLiteDatabase(object):
         int: The number of conversations deleted, or -1 if an error occurs.
         """
         try:
-            conversations = Conversation.objects.filter(
-                user__telegram_id=telegram_id
-            )
+            conversations = Conversation.objects.filter(user__telegram_id=telegram_id)
             num_deleted = int(conversations.delete()[0])
             return num_deleted
         except Exception as e:
