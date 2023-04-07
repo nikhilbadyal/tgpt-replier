@@ -160,7 +160,7 @@ class Telegram(object):
                     original_message, telegram_user
                 )
                 logger.debug(f"Removed {result} {request}")
-                if result >= ErrorCodes.exceptions.value:
+                if result > ErrorCodes.exceptions.value:
                     await event.respond(self.cleanup_success)
                 else:
                     await event.respond(self.cleanup_failure)
@@ -177,11 +177,12 @@ class Telegram(object):
                 f"Removed {num_conv_deleted} convo and {num_img_deleted} images"
             )
             if (
-                num_conv_deleted <= ErrorCodes.exceptions.value
-                or num_img_deleted <= ErrorCodes.exceptions.value
+                num_conv_deleted > ErrorCodes.exceptions.value
+                and num_img_deleted > ErrorCodes.exceptions.value
             ):
+                await event.respond(self.cleanup_success)
+            else:
                 await event.respond(self.cleanup_failure)
-            await event.respond(self.cleanup_success)
 
         @self.client.on(events.NewMessage(pattern=self.get_regex()))  # type: ignore
         async def handle_any_message(event: events.NewMessage.Event) -> None:
