@@ -16,21 +16,39 @@ from sqlitedb.utils import ErrorCodes
 class SQLiteDatabase(object):
     """SQLite database Object."""
 
-    def get_messages_by_user(self, user_id: int) -> Any:
+    def get_messages_by_user(self, telegram_id: int) -> Any:
         """Retrieve a list of messages for a user from the database.
 
         Args:
-            user_id (int): The ID of the user for which to retrieve messages.
+            telegram_id (int): The ID of the user for which to retrieve messages.
 
         Returns:
             Any: A list of message tuples for the specified user. Each tuple contains two elements:
                                     - from_bot: a boolean indicating whether the message is from the bot
                                     - message: the text of the message
         """
-        queryset = UserConversations.objects.filter(user__telegram_id=user_id).values(
-            "from_bot", "message"
-        )
-        return queryset
+        try:
+            user = User.objects.get(telegram_id=telegram_id)
+        except User.DoesNotExist:
+            logger.error(f"User with ID {telegram_id} does not exist.")
+            # TODO: Handle properly
+            return []
+
+        try:
+            current_conversation = CurrentConversation.objects.get(user=user)
+        except CurrentConversation.DoesNotExist:
+            logger.error(
+                f"No current conversation found for user with ID {telegram_id}."
+            )
+            # TODO: Handle properly
+            return []
+
+        messages = UserConversations.objects.filter(
+            user=user, conversation=current_conversation.conversation
+        ).values("from_bot", "message")
+        messages = messages.order_by("message_date")
+
+        return messages
 
     def _get_user(self, telegram_id: int) -> User | int:
         """Retrieve a User object from the database for a given user_id. If the
