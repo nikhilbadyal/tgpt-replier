@@ -1,3 +1,4 @@
+"""Models."""
 from django.db import models
 
 from manage import init_django
