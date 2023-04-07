@@ -119,6 +119,28 @@ class Telegram(object):
     def bot_listener(self, gpt: ChatGPT) -> None:
         """Listen for incoming bot messages."""
 
+        @self.client.on(events.NewMessage(pattern=self.get_regex()))  # type: ignore
+        async def handle_any_message(event: events.NewMessage.Event) -> None:
+            """Handle Start Message."""
+            logger.debug("Received request in general handler")
+            if event.is_private:  # only auto-reply to private chats
+                user: User = await self.get_user(event)
+                if user and not user.bot:
+                    if event.message.text:
+                        message = await sync_to_async(gpt.chat)(
+                            user, event.message.text
+                        )
+                        if isinstance(message, int):
+                            await event.respond(self.cleanup_failure)
+                        else:
+                            await event.respond(message)
+                    else:
+                        await event.respond(self.cleanup_failure)
+                else:
+                    logger.error("Cannot get Entity or a bot")
+            else:
+                logger.info("Not a private message")
+
         @self.client.on(events.NewMessage(pattern="/start"))  # type: ignore
         async def handle_new_message(event: events.NewMessage.Event) -> None:
             """Handle Start Message."""
@@ -183,28 +205,6 @@ class Telegram(object):
                 await event.respond(self.cleanup_success)
             else:
                 await event.respond(self.cleanup_failure)
-
-        @self.client.on(events.NewMessage(pattern=self.get_regex()))  # type: ignore
-        async def handle_any_message(event: events.NewMessage.Event) -> None:
-            """Handle Start Message."""
-            logger.debug("Received request in general handler")
-            if event.is_private:  # only auto-reply to private chats
-                user: User = await self.get_user(event)
-                if user and not user.bot:
-                    if event.message.text:
-                        message = await sync_to_async(gpt.chat)(
-                            user, event.message.text
-                        )
-                        if isinstance(message, int):
-                            await event.respond(self.cleanup_failure)
-                        else:
-                            await event.respond(message)
-                    else:
-                        await event.respond(self.cleanup_failure)
-                else:
-                    logger.error("Cannot get Entity or a bot")
-            else:
-                logger.info("Not a private message")
 
         self.client.run_until_disconnected()
         logger.info("Stopped!")
