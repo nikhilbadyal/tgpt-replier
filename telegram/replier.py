@@ -104,7 +104,11 @@ class Telegram(object):
                         else:
                             await self.send_image_from_url(user, response, result)
                     elif event.message.text:
-                        await event.respond(gpt.chat(user, event.message.text))
+                        response = gpt.chat(user, event.message.text)
+                        if isinstance(response, int):
+                            await event.respond(self.cleanup_failure)
+                        else:
+                            await event.respond(response)
                     else:
                         await event.respond("Only messages supported.")
 
@@ -151,8 +155,11 @@ class Telegram(object):
             """
             logger.debug("Received pun request")
             reply = gpt.reply_start(start_message)
-            result = reply[len(prefix) :]
-            await event.respond(result)
+            if isinstance(reply, int):
+                await event.respond(self.cleanup_failure)
+            else:
+                result = reply[len(prefix) :]
+                await event.respond(result)
 
         @self.client.on(events.NewMessage(pattern="/image"))  # type: ignore
         async def handle_image_command(event: events.NewMessage.Event) -> None:

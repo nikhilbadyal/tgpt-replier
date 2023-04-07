@@ -37,21 +37,31 @@ class ChatGPT(object):
 
         return messages
 
-    def reply_start(self, message: str) -> str:
+    def send_request(self, messages: List[Dict[str, str]]) -> int | OpenAIObject:
+        """"Send a request to OpenAI."""
+        try:
+            response: OpenAIObject = openai.ChatCompletion.create(  # type: ignore
+                model="gpt-3.5-turbo",
+                messages=messages,
+                timeout=10,
+            )
+            logger.debug("Got response fromm open AI")
+            return response
+        except Exception as e:
+            logger.error(f"Unable to get response from OpenAI {e}")
+            return ErrorCodes.exceptions.value
+
+    def reply_start(self, message: str) -> str | int:
         """Reply to start message."""
 
         messages = [
             {"role": "system", "content": "You are a helpful assistant."},
             {"role": "user", "content": message},
         ]
-        response = openai.ChatCompletion.create(  # type: ignore
-            model="gpt-3.5-turbo",
-            messages=messages,
-            timeout=10,
-        )
-        logger.debug("Got response fromm open AI")
-        reply = str(response["choices"][0]["message"]["content"])
-        return reply
+        openapi_response = self.send_request(messages)
+        if isinstance(openapi_response, int):
+            return openapi_response
+        return str(openapi_response["choices"][0]["message"]["content"])
 
     def chat(self, user: User, message: str) -> str | int:
         """Chat Open API."""
@@ -65,12 +75,9 @@ class ChatGPT(object):
             return response
         self.message_history[user.username] = self.build_message(messages)
         logger.debug("Sent request to OPENAI")
-        openapi_response = openai.ChatCompletion.create(  # type: ignore
-            model="gpt-3.5-turbo",
-            messages=self.message_history[user.username],
-            timeout=10,
-        )
-        logger.debug("Got response fromm open AI")
+        openapi_response = self.send_request(self.message_history[user.username])
+        if isinstance(openapi_response, int):
+            return openapi_response
         reply = str(openapi_response["choices"][0]["message"]["content"])
         response = db.insert_message_from_gpt(reply, user.id)
         if response <= ErrorCodes.exceptions.value:
