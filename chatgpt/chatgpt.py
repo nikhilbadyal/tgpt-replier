@@ -43,10 +43,10 @@ class ChatGPT(object):
     ) -> OpenAIObject | dict[str, list[dict[str, dict[str, str]]]] | int:
         """Send a request to OpenAI."""
         try:
-            logger.debug("Sent request to OPENAI")
             from main import env
 
             if env.bool("PROD", False):
+                logger.debug("Sent request to OPENAI")
                 response: OpenAIObject = openai.ChatCompletion.create(  # type: ignore
                     model="gpt-3.5-turbo",
                     messages=messages,
