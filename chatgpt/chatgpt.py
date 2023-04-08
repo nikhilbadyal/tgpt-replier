@@ -137,7 +137,7 @@ class ChatGPT(object):
         elif data == DataType.ALL.value:
             return db.delete_all_user_data(telegram_user.id)
         else:
-            logger.error("Not a valid choice")
+            logger.error(f"Not a valid choice {data}")
             return -1, -1
 
     def initiate_new_conversation(self, telegram_user: User, title: str) -> int:
