@@ -63,6 +63,10 @@ class User(models.Model):
         # Database table name
         db_table = "user"
 
+    def __str__(self) -> str:
+        """Return a string representation of the user object."""
+        return f"User(id={self.id}, name={self.name}, telegram_id={self.telegram_id}, status={self.status})"
+
 
 class Conversation(models.Model):
     """Model for storing conversation data.
@@ -92,6 +96,10 @@ class Conversation(models.Model):
     class Meta:
         # Database table name
         db_table = "conversation"
+
+    def __str__(self) -> str:
+        """Return a string representation of the conversation object."""
+        return f"Conversation(id={self.id}, user={self.user}, title={self.title}, start_time={self.start_time})"
 
 
 class UserConversations(models.Model):
@@ -131,6 +139,13 @@ class UserConversations(models.Model):
         # Database table name
         db_table = "user_conversations"
 
+    def __str__(self) -> str:
+        """Return a string representation of the user conversation object."""
+        return f"""
+        UserConversations(id={self.id}, user={self.user}, message={self.message}, from_bot={self.from_bot},
+        conversation={self.conversation}, message_date={self.message_date})
+        """
+
 
 class CurrentConversationManager(models.Manager):  # type: ignore
     """Manager for the CurrentConversation model."""
@@ -164,6 +179,13 @@ class CurrentConversation(models.Model):
     class Meta:
         # Database table name
         db_table = "current_conversation"
+
+    def __str__(self) -> str:
+        """Return a string representation of the current conversation
+        object."""
+        return (
+            f"CurrentConversation(user={self.user}, conversation={self.conversation})"
+        )
 
 
 class ImagesManager(models.Manager):  # type: ignore
@@ -214,3 +236,8 @@ class UserImages(models.Model):
     class Meta:
         # Database table name
         db_table = "user_images"
+
+    def __str__(self) -> str:
+        """Return a string representation of the user image object."""
+        return f"""UserImages(id={self.id}, user={self.user}, image_caption={self.image_caption},
+        image_url={self.image_url}, from_bot={self.from_bot}, message_date={self.message_date})"""
