@@ -46,19 +46,23 @@ class ChatGPT(object):
             from main import env
 
             if env.bool("PROD", False):
-                logger.debug("Sent request to OPENAI")
+                logger.debug("Sent chat completion request to OPENAI")
                 response: OpenAIObject = openai.ChatCompletion.create(  # type: ignore
                     model="gpt-3.5-turbo",
                     messages=messages,
                     timeout=10,
                 )
-                logger.debug("Got response fromm open AI")
+                logger.debug("Got chat completion response fromm open AI")
                 return response
             else:
-                logger.debug("Returned patched response from open AI")
+                logger.debug("Returned patched chat completion response from open AI")
                 return {
                     "choices": [
-                        {"message": {"content": generate_random_string(length=20)}},
+                        {
+                            "message": {
+                                "content": f"Message: {generate_random_string(length=20)}"
+                            }
+                        }
                     ]
                 }
 
