@@ -1,10 +1,15 @@
 """Handle start command."""
 # Import necessary libraries and modules
 from loguru import logger
-from telethon import events
+from telethon import TelegramClient, events
 
 # Import some helper functions
 from telegram.commands.strings import something_bad_occurred
+
+
+def add_start_handlers(client: TelegramClient) -> None:
+    """Add /start command Event Handler."""
+    client.add_event_handler(handle_start_message)
 
 
 # Register the function to handle the /start command
