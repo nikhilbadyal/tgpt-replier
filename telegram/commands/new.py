@@ -36,7 +36,7 @@ async def handle_new_command(event: events.NewMessage.Event) -> None:
     status = await sync_to_async(gpt.initiate_new_conversation)(telegram_user)
 
     # Log the conversation ID
-    logger.debug(f"Initiated new conversation with id {status}")
+    logger.debug(f"Initiated new conversation {status}")
 
     # Send a success message if the conversation was initiated successfully, otherwise send an error message
     success = "Initiated new conversation."
