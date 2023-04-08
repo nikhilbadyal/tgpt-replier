@@ -22,6 +22,7 @@ class User(models.Model):
         telegram_id (int): The ID of the user.
         status (str): The current status of the user's account (active, suspended, or temporarily banned).
         joining_date (datetime): The date and time when the user was added to the database.
+        last_updated (datetime): The date and time when the user's details were last updated.
 
     Managers:
         objects (UserManager): The custom manager for this model.
@@ -51,6 +52,9 @@ class User(models.Model):
 
     # Date and time when the user was added to the database, auto-generated
     joining_date = models.DateTimeField(auto_now_add=True)
+
+    # Date and time when the user details was modified , auto-generated
+    last_updated = models.DateTimeField(auto_now=True)
 
     # Use custom manager for this model
     objects = UserManager()
