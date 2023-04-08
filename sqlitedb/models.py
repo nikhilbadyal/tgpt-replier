@@ -68,6 +68,9 @@ class Conversation(models.Model):
     # User associated with the conversation
     user = models.ForeignKey(User, on_delete=models.CASCADE)
 
+    # Title of the conversation
+    title = models.CharField(max_length=255, null=True)
+
     class Meta:
         # Database table name
         db_table = "conversation"
