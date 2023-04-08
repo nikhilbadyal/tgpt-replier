@@ -79,10 +79,10 @@ class SQLiteDatabase(object):
             int: The ID of the user's current conversation, or -1 if an error occurs.
         """
         try:
-            current_conversation = CurrentConversation.objects.get(id=user.id)
+            current_conversation = CurrentConversation.objects.get(user=user)
             conversation_id = int(current_conversation.conversation_id)
         except CurrentConversation.DoesNotExist:
-            # Current conversation does not exist, create a new conversation
+            logger.info(f"No current conversation exists for user {user.id}")
             try:
                 conversation = Conversation(user=user)
                 conversation.save()
