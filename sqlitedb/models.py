@@ -132,7 +132,7 @@ class CurrentConversation(models.Model):
     """
 
     # User associated with the current conversation
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
 
     # Conversation the user is currently in
     conversation = models.ForeignKey(Conversation, on_delete=models.CASCADE)
