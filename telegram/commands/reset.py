@@ -23,7 +23,9 @@ def add_reset_handlers(client: TelegramClient) -> None:
 
 
 @events.register(events.callbackquery.CallbackQuery(pattern="^reset_(yes|no)$"))  # type: ignore
-async def handle_reset_confirm_response(event: events.NewMessage.Event):
+async def handle_reset_confirm_response(
+    event: events.callbackquery.CallbackQuery.Event,
+):
     """Handle reset confirmation response.
 
     This function is registered as an event handler to handle the callback query
@@ -33,11 +35,12 @@ async def handle_reset_confirm_response(event: events.NewMessage.Event):
     all user data. If the user clicks the "Fuck, No!" button, it ignores the request.
 
     Args:
-        event (events.NewMessage.Event): The event object associated with the callback query.
+        event (events.callbackquery.CallbackQuery.Event): The event object associated with the callback query.
 
     Returns:
         None: This function doesn't return anything.
     """
+    logger.debug("Received reset callback")
     if event.data == reset_yes_data:
         # Import the main function for cleaning up user data
         from main import gpt

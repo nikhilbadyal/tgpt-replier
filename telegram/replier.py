@@ -3,8 +3,9 @@
 from loguru import logger
 from telethon import TelegramClient
 
-from telegram.commands import general, image, new, reset_image_message, start
+from telegram.commands import general, image, new, start
 from telegram.commands.reset import add_reset_handlers
+from telegram.commands.reset_image_message import add_reset_image_message_handlers
 
 
 class Telegram(object):
@@ -43,11 +44,9 @@ class Telegram(object):
 
         # Register event handlers for each command the bot can handle
         add_reset_handlers(self.client)
+        add_reset_image_message_handlers(self.client)
         self.client.add_event_handler(start.handle_start_message)
         self.client.add_event_handler(image.handle_image_command)
-        self.client.add_event_handler(
-            reset_image_message.handle_reset_messages_images_command
-        )
         self.client.add_event_handler(new.handle_new_command)
         self.client.add_event_handler(general.handle_any_message)
 
