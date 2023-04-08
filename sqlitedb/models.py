@@ -57,6 +57,8 @@ class Conversation(models.Model):
     Attributes:
         id (int): The unique ID of the conversation.
         user (ForeignKey): The user associated with the conversation.
+        title (str or None): The title of the conversation, or None if no title was provided.
+        start_time (datetime): The time when the conversation was started.
 
     Meta:
         db_table (str): The name of the database table used to store this model's data.
@@ -68,8 +70,11 @@ class Conversation(models.Model):
     # User associated with the conversation
     user = models.ForeignKey(User, on_delete=models.CASCADE)
 
-    # Title of the conversation
+    # Conversation title, max length of 255, can be null
     title = models.CharField(max_length=255, null=True)
+
+    # Start time of the conversation
+    start_time = models.DateTimeField(auto_now_add=True, editable=False)
 
     class Meta:
         # Database table name
