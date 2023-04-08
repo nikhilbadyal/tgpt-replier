@@ -13,7 +13,7 @@ from telegram.commands.utils import SupportedCommands, get_user
 
 
 # Register the function to handle the /new command
-@events.register(events.NewMessage(pattern=f"^{SupportedCommands.NEW.value}$"))  # type: ignore
+@events.register(events.NewMessage(pattern=f"^{SupportedCommands.NEW.value}"))  # type: ignore
 async def handle_new_command(event: events.NewMessage.Event) -> None:
     """Handle /new command.
 
