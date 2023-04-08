@@ -38,12 +38,11 @@ async def handle_new_command(event: events.NewMessage.Event) -> None:
     prefix = prefix.ljust(len(prefix) + 1)
 
     # Extract the image query from the message text
-    result = event.message.text[len(prefix) :]
-    if len(result) == 0:
-        result = None
-
+    title = event.message.text[len(prefix) :]
+    if len(title) == 0:
+        title = None
     # Call the function to initiate a new conversation
-    status = await sync_to_async(gpt.initiate_new_conversation)(telegram_user, result)
+    status = await sync_to_async(gpt.initiate_new_conversation)(telegram_user, title)
 
     # Log the conversation ID
     logger.debug(f"Initiated new conversation {status}")
