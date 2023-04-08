@@ -27,12 +27,7 @@ class SQLiteDatabase(object):
                                     - from_bot: a boolean indicating whether the message is from the bot
                                     - message: the text of the message
         """
-        try:
-            user = User.objects.get(telegram_id=telegram_id)
-        except User.DoesNotExist:
-            logger.error(f"User with ID {telegram_id} does not exist.")
-            # TODO: Handle properly
-            return []
+        user = self._get_user(telegram_id)
 
         try:
             current_conversation = CurrentConversation.objects.get(user=user)
@@ -237,11 +232,7 @@ class SQLiteDatabase(object):
         Returns:
             ConversationResult: The result of the conversation creation operation.
         """
-        try:
-            user = User.objects.get(telegram_id=telegram_id)
-        except User.DoesNotExist:
-            logger.error(f"User with ID {telegram_id} does not exist.")
-            return ErrorCodes.exceptions.value
+        user = self._get_user(telegram_id)
 
         conversation = Conversation(user=user)
         try:
