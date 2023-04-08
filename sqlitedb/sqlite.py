@@ -222,19 +222,20 @@ class SQLiteDatabase(object):
         ), self.delete_all_user_images(telegram_id)
         return num_conv_deleted, num_img_deleted
 
-    def initiate_new_conversation(self, telegram_id: int) -> int:
+    def initiate_new_conversation(self, telegram_id: int, title: str) -> int:
         """Initiates a new conversation for a user by creating a new
         Conversation object and a new CurrentConversation object.
 
         Args:
             telegram_id (int): The ID of the user for which to start a new conversation.
+            title (str): The title of the new conversation.
 
         Returns:
             ConversationResult: The result of the conversation creation operation.
         """
         user = self._get_user(telegram_id)
 
-        conversation = Conversation(user=user)
+        conversation = Conversation(user=user, title=title)
         try:
             conversation.save()
         except Exception as e:

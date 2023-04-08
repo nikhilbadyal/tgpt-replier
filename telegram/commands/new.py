@@ -32,8 +32,16 @@ async def handle_new_command(event: events.NewMessage.Event) -> None:
     # Get the user associated with the message
     telegram_user: User = await get_user(event)
 
+    # Define a prefix for the image URL
+    prefix = "/new "
+
+    # Extract the image query from the message text
+    result = event.message.text[len(prefix) :]
+    if len(result) == 0:
+        result = None
+
     # Call the function to initiate a new conversation
-    status = await sync_to_async(gpt.initiate_new_conversation)(telegram_user)
+    status = await sync_to_async(gpt.initiate_new_conversation)(telegram_user, result)
 
     # Log the conversation ID
     logger.debug(f"Initiated new conversation {status}")

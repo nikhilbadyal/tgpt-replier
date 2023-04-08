@@ -140,8 +140,8 @@ class ChatGPT(object):
             logger.error("Not a valid choice")
             return -1, -1
 
-    def initiate_new_conversation(self, telegram_user: User) -> int:
+    def initiate_new_conversation(self, telegram_user: User, title: str) -> int:
         """Initiate a new conversation."""
         from main import db
 
-        return db.initiate_new_conversation(telegram_user.id)
+        return db.initiate_new_conversation(telegram_user.id, title)
