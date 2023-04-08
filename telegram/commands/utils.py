@@ -25,7 +25,7 @@ async def get_user(event: events.NewMessage.Event) -> User:
     try:
         # Get the user entity from the peer ID of the message event, Uses cache
         user: User = await event.client.get_entity(event.peer_id)
-    except ValueError:
+    except (ValueError, AttributeError):
         # If the peer ID is invalid, get the sender entity from the message event
         user = await event.get_sender()
     return user
