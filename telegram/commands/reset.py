@@ -8,7 +8,7 @@ from telethon.tl.types import User
 # Import some helper functions
 from sqlitedb.utils import ErrorCodes
 from telegram.commands.strings import cleanup_success, ignore, something_bad_occurred
-from telegram.commands.utils import get_user
+from telegram.commands.utils import SupportedCommands, get_user
 
 reset_yes_data = b"reset_yes"
 reset_yes_description = "Yes!"
@@ -49,7 +49,7 @@ async def handle_reset_confirm_response(
         telegram_user: User = await get_user(event)
         # Call the function to clean up user data
         num_conv_deleted, num_img_deleted = await sync_to_async(gpt.clean_up_user_data)(
-            "/reset", telegram_user
+            SupportedCommands.RESET.value, telegram_user
         )
 
         # Log the number of items deleted
@@ -68,7 +68,7 @@ async def handle_reset_confirm_response(
 
 
 # Register the function to handle the /reset command
-@events.register(events.NewMessage(pattern="^/reset$"))  # type: ignore
+@events.register(events.NewMessage(pattern=f"^{SupportedCommands.RESET.value}$"))  # type: ignore
 async def handle_reset_command(event: events.NewMessage.Event) -> None:
     """Handle /reset command Delete all message history for a user.
 

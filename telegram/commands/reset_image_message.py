@@ -12,7 +12,7 @@ from telethon.tl.types import User
 # Import some helper functions
 from sqlitedb.utils import ErrorCodes
 from telegram.commands.strings import cleanup_success, ignore, something_bad_occurred
-from telegram.commands.utils import get_user
+from telegram.commands.utils import SupportedCommands, get_user
 
 # Define constants for the /resetimages and /resetmessage commands
 reset_yes_data = b"reset_im_yes"
@@ -65,7 +65,7 @@ async def handle_reset_image_message_confirm_response(
         replied_message = await event.get_message()
         reply_obj: Message = await replied_message.get_reply_message()
         reply_message = reply_obj.message
-        match = re.search(r"^/reset(.+)$", reply_message)
+        match = re.search(f"^{SupportedCommands.RESET.value}(.+)$", reply_message)
         if isinstance(match, Match):
             request = match.group(1)
 
@@ -78,7 +78,7 @@ async def handle_reset_image_message_confirm_response(
             logger.debug(f"Removed {result} {request}")
 
             # Send a success message if items were deleted, otherwise send an error message
-            if result > ErrorCodes.exceptions.value:
+            if isinstance(result, int) and result > ErrorCodes.exceptions.value:
                 await event.edit(cleanup_success)
             else:
                 await event.edit(something_bad_occurred)
@@ -89,7 +89,7 @@ async def handle_reset_image_message_confirm_response(
 
 
 # Register the function to handle the /reset command
-@events.register(events.NewMessage(pattern="^/reset(messages|images)$"))  # type: ignore
+@events.register(events.NewMessage(pattern=f"^{SupportedCommands.RESET.value}(messages|images)$"))  # type: ignore
 async def handle_reset_messages_images_command(event: events.NewMessage.Event) -> None:
     """Handle /resetmessages and /resetimages commands.
 
@@ -109,7 +109,7 @@ async def handle_reset_messages_images_command(event: events.NewMessage.Event) -
     """
     # Get the original message text and extract the request type
     original_message = event.message.text
-    match = re.search(r"^/reset(.+)$", original_message)
+    match = re.search(f"^{SupportedCommands.RESET.value}(.+)$", original_message)
     if match:
         request = match.group(1)
 

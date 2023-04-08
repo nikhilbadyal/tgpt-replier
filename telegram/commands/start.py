@@ -5,6 +5,7 @@ from telethon import TelegramClient, events
 
 # Import some helper functions
 from telegram.commands.strings import something_bad_occurred
+from telegram.commands.utils import SupportedCommands
 
 
 def add_start_handlers(client: TelegramClient) -> None:
@@ -13,7 +14,7 @@ def add_start_handlers(client: TelegramClient) -> None:
 
 
 # Register the function to handle the /start command
-@events.register(events.NewMessage(pattern="/start$"))  # type: ignore
+@events.register(events.NewMessage(pattern=f"^{SupportedCommands.START.value}$"))  # type: ignore
 async def handle_start_message(event: events.NewMessage.Event) -> None:
     """Handle /start command.
 

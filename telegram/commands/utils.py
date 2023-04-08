@@ -1,16 +1,38 @@
 """Utility functions."""
+from enum import Enum
+from typing import List
+
 from telethon import events
 from telethon.tl.types import User
 
+
 # Define a list of supported commands
-supported_commands = [
-    "start",
-    "image",
-    "resetmessages",
-    "resetimages",
-    "reset",
-    "new",
-]
+class SupportedCommands(Enum):
+    """Enum for supported commands."""
+
+    START: str = "/start"
+    IMAGE: str = "/image"
+    RESET_MESSAGES: str = "/resetmessages"
+    RESET_IMAGES: str = "/resetimages"
+    RESET: str = "/reset"
+    NEW: str = "/new"
+
+    @classmethod
+    def get_values(cls) -> List[str]:
+        """Returns a list of all the values of the SupportedCommands enum.
+
+        Returns:
+            list: A list of all the values of the SupportedCommands enum.
+        """
+        return [command.value for command in cls]
+
+    def __str__(self) -> str:
+        """Returns the string representation of the enum value.
+
+        Returns:
+            str: The string representation of the enum value.
+        """
+        return self.value
 
 
 async def get_user(event: events.NewMessage.Event) -> User:
@@ -39,5 +61,5 @@ def get_regex() -> str:
         str: A regex pattern as a string.
     """
     # Exclude any message that starts with one of the supported commands using negative lookahead
-    pattern = r"^(?!/(%s))[^/].*" % "|".join(supported_commands)
+    pattern = r"^(?!(%s))[^/].*" % "|".join(SupportedCommands.get_values())
     return pattern

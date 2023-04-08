@@ -8,7 +8,7 @@ from telethon.tl.types import User
 
 # Import some helper functions
 from telegram.commands.strings import no_input, something_bad_occurred
-from telegram.commands.utils import get_user
+from telegram.commands.utils import SupportedCommands, get_user
 
 
 # Define a function to download an image from a URL and send it to the user
@@ -33,7 +33,7 @@ async def send_image_from_url(
 
 
 # Register the function to handle the /image command
-@events.register(events.NewMessage(pattern="/image$"))  # type: ignore
+@events.register(events.NewMessage(pattern=f"^{SupportedCommands.IMAGE.value}$"))  # type: ignore
 async def handle_image_command(event: events.NewMessage.Event) -> None:
     """Handle /image command.
 

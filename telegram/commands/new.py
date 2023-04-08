@@ -9,11 +9,11 @@ from telethon.tl.types import User
 # Import some helper functions
 from sqlitedb.utils import ErrorCodes
 from telegram.commands.strings import something_bad_occurred
-from telegram.commands.utils import get_user
+from telegram.commands.utils import SupportedCommands, get_user
 
 
 # Register the function to handle the /new command
-@events.register(events.NewMessage(pattern="^/new$"))  # type: ignore
+@events.register(events.NewMessage(pattern=f"^{SupportedCommands.NEW.value}$"))  # type: ignore
 async def handle_new_command(event: events.NewMessage.Event) -> None:
     """Handle /new command.
 

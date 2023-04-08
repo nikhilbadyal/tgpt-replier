@@ -3,6 +3,8 @@ import random
 import string
 from enum import Enum
 
+from telegram.commands.utils import SupportedCommands
+
 
 class UserType(Enum):
     """User type."""
@@ -14,9 +16,9 @@ class UserType(Enum):
 class DataType(Enum):
     """Data type."""
 
-    MESSAGES = "/resetmessages"
-    IMAGES = "/resetimages"
-    ALL = "/reset"
+    MESSAGES = SupportedCommands.RESET_MESSAGES.value
+    IMAGES = SupportedCommands.RESET_IMAGES.value
+    ALL = SupportedCommands.RESET.value
 
 
 def generate_random_string(length: int = 10) -> str:
