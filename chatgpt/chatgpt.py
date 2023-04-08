@@ -6,7 +6,7 @@ from loguru import logger
 from openai.openai_object import OpenAIObject
 from telethon.tl.types import User
 
-from chatgpt.utils import DataType, UserType
+from chatgpt.utils import DataType, UserType, generate_random_string
 from sqlitedb.utils import ErrorCodes
 
 
@@ -38,17 +38,28 @@ class ChatGPT(object):
 
         return messages
 
-    def send_request(self, messages: List[Dict[str, str]]) -> int | OpenAIObject:
+    def send_request(
+        self, messages: List[Dict[str, str]]
+    ) -> OpenAIObject | dict[str, list[dict[str, dict[str, str]]]] | int:
         """Send a request to OpenAI."""
         try:
             logger.debug("Sent request to OPENAI")
-            response: OpenAIObject = openai.ChatCompletion.create(  # type: ignore
-                model="gpt-3.5-turbo",
-                messages=messages,
-                timeout=10,
-            )
-            logger.debug("Got response fromm open AI")
-            return response
+            from main import env
+
+            if env.bool("PROD", False):
+                response: OpenAIObject = openai.ChatCompletion.create(  # type: ignore
+                    model="gpt-3.5-turbo",
+                    messages=messages,
+                    timeout=10,
+                )
+                logger.debug("Got response fromm open AI")
+                return response
+            else:
+                return {
+                    "choices": [
+                        {"message": {"content": generate_random_string(length=20)}},
+                    ]
+                }
         except Exception as e:
             logger.error(f"Unable to get response from OpenAI {e}")
             return ErrorCodes.exceptions.value
