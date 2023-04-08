@@ -41,6 +41,7 @@ class ChatGPT(object):
     def send_request(self, messages: List[Dict[str, str]]) -> int | OpenAIObject:
         """Send a request to OpenAI."""
         try:
+            logger.debug("Sent request to OPENAI")
             response: OpenAIObject = openai.ChatCompletion.create(  # type: ignore
                 model="gpt-3.5-turbo",
                 messages=messages,
@@ -75,7 +76,6 @@ class ChatGPT(object):
         if response <= ErrorCodes.exceptions.value:
             return response
         self.message_history[user.username] = self.build_message(messages)
-        logger.debug("Sent request to OPENAI")
         openapi_response = self.send_request(self.message_history[user.username])
         if isinstance(openapi_response, int):
             return openapi_response
