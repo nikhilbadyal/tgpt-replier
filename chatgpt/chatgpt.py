@@ -55,11 +55,13 @@ class ChatGPT(object):
                 logger.debug("Got response fromm open AI")
                 return response
             else:
+                logger.debug("Returned patched response from open AI")
                 return {
                     "choices": [
                         {"message": {"content": generate_random_string(length=20)}},
                     ]
                 }
+
         except Exception as e:
             logger.error(f"Unable to get response from OpenAI {e}")
             return ErrorCodes.exceptions.value
