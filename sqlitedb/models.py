@@ -2,6 +2,7 @@
 from django.db import models
 
 from manage import init_django
+from sqlitedb.utils import UserStatus
 
 init_django()
 
@@ -19,6 +20,7 @@ class User(models.Model):
         id (int): The unique ID of the user.
         name (str or None): The name of the user, or None if no name was provided.
         telegram_id (int): The ID of the user.
+        status (str): The current status of the user's account (active, suspended, or temporarily banned).
         joining_date (datetime): The date and time when the user was added to the database.
 
     Managers:
@@ -39,6 +41,13 @@ class User(models.Model):
 
     # User Telegram ID, integer
     telegram_id = models.IntegerField(unique=True)
+
+    # State of the user
+    status = models.CharField(
+        max_length=20,
+        choices=[(status.value, status.name) for status in UserStatus],
+        default=UserStatus.ACTIVE.value,
+    )
 
     # Date and time when the user was added to the database, auto-generated
     joining_date = models.DateTimeField(auto_now_add=True)
