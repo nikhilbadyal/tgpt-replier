@@ -33,7 +33,9 @@ async def handle_new_command(event: events.NewMessage.Event) -> None:
     telegram_user: User = await get_user(event)
 
     # Define a prefix for the image URL
-    prefix = "/new "
+    prefix = f"{SupportedCommands.NEW.value}"
+    # Pad by 1 to consider the space after command
+    prefix = prefix.ljust(len(prefix) + 1)
 
     # Extract the image query from the message text
     result = event.message.text[len(prefix) :]

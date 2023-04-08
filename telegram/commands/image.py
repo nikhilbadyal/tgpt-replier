@@ -50,7 +50,9 @@ async def handle_image_command(event: events.NewMessage.Event) -> None:
     logger.debug("Received image request")
 
     # Define a prefix for the image URL
-    prefix = "/image "
+    prefix = f"{SupportedCommands.IMAGE.value}"
+    # Pad by 1 to consider the space after command
+    prefix = prefix.ljust(len(prefix) + 1)
 
     # Get the user associated with the message
     telegram_user: User = await get_user(event)
