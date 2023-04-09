@@ -104,7 +104,6 @@ class ChatGPT(object):
 
     def reply_start(self, message: str) -> str | int:
         """Reply to start message."""
-
         messages = [
             {"role": "system", "content": "You are a helpful assistant."},
             {"role": "user", "content": message},

@@ -9,7 +9,6 @@ def init_django() -> None:
     database and the `sqlitedb` app. If the settings have already been
     configured, this function does nothing.
     """
-
     import django
     from django.conf import settings
 
