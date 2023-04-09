@@ -33,9 +33,7 @@ class SQLiteDatabase(object):
         try:
             current_conversation = CurrentConversation.objects.get(user=user)
         except CurrentConversation.DoesNotExist:
-            logger.error(
-                f"No current conversation found for user with ID {telegram_id}."
-            )
+            logger.error(f"No current conversation found for user with ID {user}.")
             # TODO: Handle properly
             return []
 
@@ -83,7 +81,7 @@ class SQLiteDatabase(object):
             current_conversation = CurrentConversation.objects.get(user=user)
             conversation_id = int(current_conversation.conversation_id)
         except CurrentConversation.DoesNotExist:
-            logger.info(f"No current conversation exists for user {user.id}")
+            logger.info(f"No current conversation exists for user {user}")
             try:
                 openai_response = ChatGPT.send_text_completion_request(message)
                 if isinstance(openai_response, int):
