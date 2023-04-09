@@ -9,7 +9,7 @@ from sqlitedb.models import User
 from sqlitedb.utils import UserStatus
 
 
-@pytest.fixture  # type: ignore
+@pytest.fixture
 def user() -> User:
     """A fixture that generates a sample user object with pre-defined
     values."""
@@ -21,7 +21,7 @@ def user() -> User:
     return User.objects.create(**user)  # type: ignore
 
 
-@pytest.mark.django_db  # type: ignore
+@pytest.mark.django_db
 def test_create_user(user: User) -> None:
     """Test creating a new user and saving it to the database.
 
@@ -39,7 +39,7 @@ def test_create_user(user: User) -> None:
     assert isinstance(user.last_updated, datetime)
 
 
-@pytest.mark.django_db  # type: ignore
+@pytest.mark.django_db
 def test_unique_telegram_id(user: User) -> None:
     """Test that creating a user with a non-unique Telegram ID raises an
     IntegrityError.
@@ -56,7 +56,7 @@ def test_unique_telegram_id(user: User) -> None:
         )
 
 
-@pytest.mark.django_db  # type: ignore
+@pytest.mark.django_db
 def test_update_user(user: User) -> None:
     """Test updating a user's details and saving the changes to the database.
 
@@ -77,7 +77,7 @@ def test_update_user(user: User) -> None:
     assert updated_user.last_updated > user.joining_date
 
 
-@pytest.mark.django_db  # type: ignore
+@pytest.mark.django_db
 def test_delete_user(user: User) -> None:
     """Test deleting a user from the database.
 
@@ -94,7 +94,7 @@ def test_delete_user(user: User) -> None:
         User.objects.get(id=user_id)
 
 
-@pytest.mark.django_db  # type: ignore
+@pytest.mark.django_db
 def test_string_representation(user: User) -> None:
     """Test the string representation of a user object.
 
@@ -110,7 +110,7 @@ def test_string_representation(user: User) -> None:
     )
 
 
-@pytest.mark.django_db  # type: ignore
+@pytest.mark.django_db
 def test_get_active_users(user: User) -> None:
     """Test getting all active users from the database.
 
@@ -125,7 +125,7 @@ def test_get_active_users(user: User) -> None:
     assert active_users[0].id == user.id
 
 
-@pytest.mark.django_db  # type: ignore
+@pytest.mark.django_db
 def test_get_suspended_users(user: User) -> None:
     """Test getting all suspended users from the database.
 
@@ -139,7 +139,7 @@ def test_get_suspended_users(user: User) -> None:
     assert len(suspended_users) == 0
 
 
-@pytest.mark.django_db  # type: ignore
+@pytest.mark.django_db
 def test_get_temporarily_banned_users(user: User) -> None:
     """Test getting all temporarily banned users from the database.
 
@@ -153,7 +153,7 @@ def test_get_temporarily_banned_users(user: User) -> None:
     assert len(temporarily_banned_users) == 0
 
 
-@pytest.mark.django_db  # type: ignore
+@pytest.mark.django_db
 def test_last_updated_auto_now(user: User) -> None:
     """Test that the 'last_updated' field is automatically updated when a user
     object is modified and saved.
