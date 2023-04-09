@@ -70,6 +70,38 @@ class ChatGPT(object):
             logger.error(f"Unable to get response from OpenAI {e}")
             return ErrorCodes.exceptions.value
 
+    @staticmethod
+    def send_text_completion_request(
+        messages: str,
+    ) -> dict[str, list[dict[str, str]]] | int:
+        """Send a Text completion request to OpenAI."""
+        try:
+            from main import env
+
+            if env.bool("PROD", False):
+                logger.debug("Sent text completion request to OPENAI")
+                response: OpenAIObject = openai.Completion.create(  # type: ignore
+                    model="text-davinci-003",
+                    temperature=0,
+                    prompt=messages,
+                    timeout=10,
+                )
+                logger.debug("Got text completion response fromm open AI")
+                return response
+            else:
+                logger.debug("Returned patched text completion response from open AI")
+                return {
+                    "choices": [
+                        {
+                            "text": f"Title: {generate_random_string(length=20)}",
+                        }
+                    ],
+                }
+
+        except Exception as e:
+            logger.error(f"Unable to get response from OpenAI {e}")
+            return ErrorCodes.exceptions.value
+
     def reply_start(self, message: str) -> str | int:
         """Reply to start message."""
 
@@ -148,4 +180,9 @@ class ChatGPT(object):
         """Initiate a new conversation."""
         from main import db
 
-        return db.initiate_new_conversation(telegram_user.id, title)
+        if title:
+            logger.debug("Initializing new conversation with title")
+            return db.initiate_new_conversation(telegram_user.id, title)
+        else:
+            logger.debug("Initializing new conversation without title")
+            return db.initiate_empty_new_conversation(telegram_user.id)

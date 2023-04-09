@@ -3,6 +3,7 @@ from typing import Any, Tuple
 
 from loguru import logger
 
+from chatgpt.chatgpt import ChatGPT
 from sqlitedb.models import (
     Conversation,
     CurrentConversation,
@@ -68,7 +69,7 @@ class SQLiteDatabase(object):
                 return ErrorCodes.exceptions.value
         return user
 
-    def _get_current_conversation(self, user: User) -> int:
+    def _get_current_conversation(self, user: User, message: str) -> int:
         """Retrieve a CurrentConversation object from the database given a User
         object.
 
@@ -84,7 +85,11 @@ class SQLiteDatabase(object):
         except CurrentConversation.DoesNotExist:
             logger.info(f"No current conversation exists for user {user.id}")
             try:
-                conversation = Conversation(user=user)
+                openai_response = ChatGPT.send_text_completion_request(message)
+                if isinstance(openai_response, int):
+                    return ErrorCodes.exceptions.value
+                chat_title = openai_response["choices"][0]["text"]
+                conversation = Conversation(user=user, title=chat_title)
                 conversation.save()
                 current_conversation = CurrentConversation(
                     user=user, conversation=conversation
@@ -110,7 +115,10 @@ class SQLiteDatabase(object):
         try:
             user = self._get_user(user_id)
             if isinstance(user, User):
-                conversation_id = self._get_current_conversation(user)
+                conversation_id = self._get_current_conversation(user, message)
+                if conversation_id <= ErrorCodes.exceptions.value:
+                    logger.error("Unable to get current conversation")
+                    return ErrorCodes.exceptions.value
                 conversation = UserConversations(
                     user=user,
                     message=message,
@@ -261,4 +269,22 @@ class SQLiteDatabase(object):
             conversation.delete()
             return ErrorCodes.exceptions.value
 
+        return ErrorCodes.success.value
+
+    def initiate_empty_new_conversation(self, telegram_id: int) -> int:
+        """Initiates a new empty conversation for a user by creating a new
+        Conversation object and a new CurrentConversation object.
+
+        Args:
+            telegram_id (int): The ID of the user for which to start a new conversation.
+
+        Returns:
+            ConversationResult: The result of the conversation creation operation.
+        """
+        user = self._get_user(telegram_id)
+
+        try:
+            CurrentConversation.objects.get(user=user).delete()
+        except CurrentConversation.DoesNotExist:
+            logger.info(f"No current conversation for user {user}")
         return ErrorCodes.success.value
