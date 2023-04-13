@@ -1,11 +1,14 @@
 """User Test cases."""
 
 from datetime import datetime, timedelta
+from typing import Any, no_type_check_decorator
 
 import pytest
 from django.db import IntegrityError
+from django.utils import timezone
 
-from sqlitedb.models import User
+from sqlitedb.models import Conversation, CurrentConversation, User, UserConversations
+from sqlitedb.sqlite import SQLiteDatabase
 from sqlitedb.utils import UserStatus
 
 
@@ -19,6 +22,71 @@ def user() -> User:
         "status": UserStatus.ACTIVE.value,
     }
     return User.objects.create(**user)  # type: ignore
+
+
+@pytest.fixture
+def user_with_messages(db: Any) -> User:
+    """Dummy user with messages for test cases."""
+    user: User = User.objects.create(telegram_id=12345)
+    conversation = Conversation.objects.create(user=user)
+    CurrentConversation.objects.create(user=user, conversation=conversation)
+    UserConversations.objects.create(
+        user=user, message="Hello", from_bot=False, conversation=conversation
+    )
+    UserConversations.objects.create(
+        user=user, message="Hi", from_bot=True, conversation=conversation
+    )
+    return user
+
+
+@pytest.fixture
+def user_without_messages(db: Any) -> User:
+    """Dummy user without messages for test cases."""
+    user: User = User.objects.create(telegram_id=23456)
+    conversation = Conversation.objects.create(user=user)
+    CurrentConversation.objects.create(user=user, conversation=conversation)
+    return user
+
+
+@no_type_check_decorator
+@pytest.fixture
+def user_no_conversation(db: Any) -> User:
+    """Dummy user without messages for test cases."""
+    user: User = User.objects.create(telegram_id=34567)
+    return user
+
+
+@pytest.fixture
+def user_with_ordered_messages(db: Any) -> User:
+    """User with multiple messages."""
+    user: User = User.objects.create(telegram_id=45678)
+    conversation = Conversation.objects.create(user=user)
+    CurrentConversation.objects.create(user=user, conversation=conversation)
+
+    now = timezone.now()
+    UserConversations.objects.create(
+        user=user,
+        message="First message",
+        from_bot=False,
+        conversation=conversation,
+        message_date=now - timedelta(minutes=5),
+    )
+    UserConversations.objects.create(
+        user=user,
+        message="Second message",
+        from_bot=True,
+        conversation=conversation,
+        message_date=now - timedelta(minutes=3),
+    )
+    UserConversations.objects.create(
+        user=user,
+        message="Third message",
+        from_bot=False,
+        conversation=conversation,
+        message_date=now - timedelta(minutes=1),
+    )
+
+    return user
 
 
 @pytest.mark.django_db
@@ -188,3 +256,51 @@ def test_joining_date_auto_now_add(user) -> None:
         <= user.joining_date
         <= (now + timedelta(seconds=1))
     )
+
+
+@pytest.mark.django_db  # type: ignore
+def test_get_messages_by_user_valid_user_and_messages(user_with_messages):
+    bot = SQLiteDatabase()
+    messages = bot.get_messages_by_user(user_with_messages.telegram_id)
+    assert len(messages) > 0
+    assert all(
+        isinstance(msg, dict)
+        and len(msg) == 2
+        and "from_bot" in msg
+        and "message" in msg
+        for msg in messages
+    )
+
+
+@pytest.mark.django_db  # type: ignore
+def test_get_messages_by_user_valid_user_no_messages(user_without_messages):
+    bot = SQLiteDatabase()
+    messages = bot.get_messages_by_user(user_without_messages.telegram_id)
+    assert len(messages) == 0
+
+
+@pytest.mark.django_db  # type: ignore
+def test_get_messages_by_user_invalid_user():
+    bot = SQLiteDatabase()
+    non_existent_telegram_id = -1
+    messages = bot.get_messages_by_user(non_existent_telegram_id)
+    assert messages == []
+
+
+@pytest.mark.django_db  # type: ignore
+def test_get_messages_by_user_no_current_conversation(user_no_conversation):
+    bot = SQLiteDatabase()
+    messages = bot.get_messages_by_user(user_no_conversation.telegram_id)
+    assert messages == []
+
+
+def test_get_messages_by_user_message_order(user_with_ordered_messages: User) -> None:
+    bot = SQLiteDatabase()
+    messages = bot.get_messages_by_user(user_with_ordered_messages.telegram_id)
+    message_dates = (
+        UserConversations.objects.filter(user=user_with_ordered_messages)
+        .order_by("message_date")
+        .values_list("message_date", flat=True)
+    )
+    for i in range(len(messages) - 1):
+        assert message_dates[i] <= message_dates[i + 1]
