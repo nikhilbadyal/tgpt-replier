@@ -1,30 +1,10 @@
 """Test Conversation."""
 from datetime import datetime
-from typing import Generator
 
 import pytest
 from django.utils import timezone
 
 from sqlitedb.models import Conversation, User
-
-
-@pytest.fixture
-def user() -> Generator[User, None, None]:
-    """Fixture for creating a user."""
-    user = User.objects.create(name="John", telegram_id=1234)
-    yield user
-    user.delete()
-
-
-@pytest.fixture
-def conversation(user: User) -> Conversation:
-    """Create a test conversation."""
-    conversation = Conversation.objects.create(
-        user=user,
-        title="Test Conversation",
-        start_time=timezone.now(),
-    )
-    return conversation
 
 
 @pytest.mark.django_db
