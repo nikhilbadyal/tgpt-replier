@@ -5,3 +5,5 @@ venv
 .env
 *.session*
 *.db
+report.html
+.coverage
