@@ -1,0 +1,136 @@
+[
+  {
+    "model": "sqlitedb.user",
+    "pk": 1,
+    "fields": {
+      "name": "John Doe",
+      "telegram_id": 123456789,
+      "status": "active",
+      "joining_date": "2023-04-14T12:00:00",
+      "last_updated": "2023-04-14T12:00:00"
+    }
+  },
+  {
+    "model": "sqlitedb.user",
+    "pk": 2,
+    "fields": {
+      "name": "Bob Doe",
+      "telegram_id": 5432198760,
+      "status": "active",
+      "joining_date": "2023-04-14T12:00:00",
+      "last_updated": "2023-04-14T12:00:00"
+    }
+  },
+  {
+    "model": "sqlitedb.conversation",
+    "pk": 1,
+    "fields": {
+      "user": 1,
+      "title": "Sample Conversation",
+      "start_time": "2023-04-14T12:05:00"
+    }
+  },
+  {
+    "model": "sqlitedb.conversation",
+    "pk": 2,
+    "fields": {
+      "user": 1,
+      "title": "Sample Conversation 2",
+      "start_time": "2023-04-15T12:05:00"
+    }
+  },
+  {
+    "model": "sqlitedb.conversation",
+    "pk": 3,
+    "fields": {
+      "user": 2,
+      "title": "Sample Conversation",
+      "start_time": "2023-04-14T12:05:00"
+    }
+  },
+  {
+    "model": "sqlitedb.currentconversation",
+    "pk": 1,
+    "fields": {
+      "user": 1,
+      "conversation": 1
+    }
+  },
+  {
+    "model": "sqlitedb.userconversations",
+    "pk": 1,
+    "fields": {
+      "user": 1,
+      "message": "Hello!!",
+      "from_bot": false,
+      "conversation": 1,
+      "message_date": "2023-04-13T12:06:00"
+    }
+  },
+  {
+    "model": "sqlitedb.userconversations",
+    "pk": 2,
+    "fields": {
+      "user": 1,
+      "message": "Hello, how can I help you?",
+      "from_bot": true,
+      "conversation": 1,
+      "message_date": "2023-04-14T12:06:00"
+    }
+  },
+  {
+    "model": "sqlitedb.userconversations",
+    "pk": 3,
+    "fields": {
+      "user": 1,
+      "message": "I have a question.",
+      "from_bot": false,
+      "conversation": 1,
+      "message_date": "2023-04-15T12:06:00"
+    }
+  },
+  {
+    "model": "sqlitedb.userconversations",
+    "pk": 4,
+    "fields": {
+      "user": 1,
+      "message": "Sure, what's your question?",
+      "from_bot": true,
+      "conversation": 1,
+      "message_date": "2023-04-16T12:06:00"
+    }
+  },
+  {
+  "model": "sqlitedb.userconversations",
+  "pk": 5,
+  "fields": {
+    "user": 1,
+    "message": "How does this feature work?",
+    "from_bot": false,
+    "conversation": 1,
+    "message_date": "2023-04-17T12:06:00"
+  }
+},
+  {
+    "model": "sqlitedb.userconversations",
+    "pk": 6,
+    "fields": {
+      "user": 1,
+      "message": "This is second conversation",
+      "from_bot": false,
+      "conversation": 2,
+      "message_date": "2023-04-18T12:06:00"
+    }
+  },
+  {
+    "model": "sqlitedb.userconversations",
+    "pk": 7,
+    "fields": {
+      "user": 2,
+      "message": "This is Bob's conversation",
+      "from_bot": false,
+      "conversation": 3,
+      "message_date": "2023-04-18T12:06:00"
+    }
+  }
+]
