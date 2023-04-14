@@ -124,7 +124,7 @@ class SQLiteDatabase(object):
                     conversation_id=conversation_id,
                 )
                 conversation.save()
-                return 0
+                return ErrorCodes.success.value
             return user
         except Exception as e:
             logger.error(f"Unable to save conversation {e}")
