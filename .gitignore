@@ -7,3 +7,6 @@ venv
 *.db
 report.html
 .coverage
+reports
+/.scannerwork
+*.properties
