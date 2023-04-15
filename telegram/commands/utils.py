@@ -1,6 +1,6 @@
 """Utility functions."""
 from enum import Enum
-from typing import List
+from typing import Any, List, Optional
 
 from telethon import events
 from telethon.tl.types import User
@@ -73,4 +73,25 @@ def get_regex() -> str:
 class UserSettings(Enum):
     """User Settings."""
 
-    PAGE_SIZE: str = "page_size"
+    PAGE_SIZE = "page_size", "The number of conversations displayed per page."
+
+    def __new__(cls, *args: Any, **kwds: Any) -> "UserSettings":
+        obj = object.__new__(cls)
+        obj._value_ = args[0]
+        return obj
+
+    # ignore the first param since it's already set by __new__
+    def __init__(self, _: str, description: Optional[str] = None):
+        self._description_ = description
+
+    def __str__(self) -> str:
+        return str(self.value)
+
+    @property
+    def description(self) -> Optional[str]:
+        """Returns the description of the setting.
+
+        Returns:
+            Optional[str]: The description of the setting.
+        """
+        return self._description_

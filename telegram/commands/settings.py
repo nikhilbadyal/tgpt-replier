@@ -2,7 +2,7 @@
 
 from asgiref.sync import sync_to_async
 from loguru import logger
-from telethon import TelegramClient, events
+from telethon import Button, TelegramClient, events
 
 from telegram.commands.user_settings import modify_page_size
 from telegram.commands.utils import SupportedCommands, UserSettings
@@ -11,9 +11,27 @@ from telegram.commands.utils import SupportedCommands, UserSettings
 def add_settings_handlers(client: TelegramClient) -> None:
     """Add /settings command Event Handler."""
     client.add_event_handler(handle_settings_command)
+    client.add_event_handler(handle_settings_list_settings)
 
 
-# Register the function to handle the /list command
+@events.register(events.CallbackQuery(pattern="list_settings"))  # type: ignore
+async def handle_settings_list_settings(
+    event: events.callbackquery.CallbackQuery.Event,
+):
+    """Event handler for listing available settings.
+
+    Args:
+        event (CallbackQuery.Event): The callback query event.
+    """
+    await event.answer()
+
+    response = "**Available settings**:\n\n"
+    for setting in UserSettings:
+        response += f"- `{setting.name}`: {setting.description}\n"
+
+    await event.edit(response, parse_mode="markdown")
+
+
 @events.register(events.NewMessage(pattern=f"^{SupportedCommands.SETTINGS.value}"))  # type: ignore
 async def handle_settings_command(event: events.NewMessage.Event) -> None:
     """Event handler for the /settings command.
@@ -26,9 +44,15 @@ async def handle_settings_command(event: events.NewMessage.Event) -> None:
     # Extract the setting name and new value from the input message
     parts = event.message.text.split()
     if len(parts) < 3:
-        await event.reply(
-            "Please provide the setting name and the new value, e.g., '/settings page_size 15'"
+        response = "To update a setting, use the following command format:\n``/settings <setting_name> <value>`\n\n"
+        response += "**For example**:\n`/settings page_size 5`\n\n"
+        response += (
+            "Click the **List Settings** button below to see available settings."
         )
+
+        buttons = [Button.inline("List Settings", data="list_settings")]
+
+        await event.reply(response, buttons=buttons, parse_mode="markdown")
         return
 
     setting_name = parts[1]
