@@ -5,6 +5,8 @@ from typing import List
 from telethon import events
 from telethon.tl.types import User
 
+PAGE_SIZE = 10  # Number of conversations per page
+
 
 # Define a list of supported commands
 class SupportedCommands(Enum):
@@ -17,6 +19,7 @@ class SupportedCommands(Enum):
     RESET: str = "/reset"
     NEW: str = "/new"
     LIST: str = "/list"
+    SETTINGS: str = "/settings"
 
     @classmethod
     def get_values(cls) -> List[str]:
