@@ -122,7 +122,7 @@ class GetUserTestCase(TestCase):
         controller = SQLiteDatabase()
 
         # Call the _get_user function
-        retrieved_user = controller._get_user(telegram_id)
+        retrieved_user = controller.get_user(telegram_id)
 
         # Check that the function returns the correct user
         self.assertEqual(retrieved_user, user)
@@ -137,7 +137,7 @@ class GetUserTestCase(TestCase):
         controller = SQLiteDatabase()
 
         # Call the _get_user function
-        new_user = controller._get_user(non_existing_telegram_id)
+        new_user = controller.get_user(non_existing_telegram_id)
 
         # Check that the function returns a User object
         self.assertIsInstance(new_user, User)
@@ -162,7 +162,7 @@ class GetUserTestCase(TestCase):
         # Patch the User.save() method to raise an exception
         with patch.object(User, "save", side_effect=Exception("Error creating user")):
             # Call the _get_user function
-            result = controller._get_user(non_existing_telegram_id)
+            result = controller.get_user(non_existing_telegram_id)
 
             # Check that the function returns the error code
             self.assertEqual(result, ErrorCodes.exceptions.value)

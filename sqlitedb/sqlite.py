@@ -29,7 +29,7 @@ class SQLiteDatabase(object):
                                     - from_bot: a boolean indicating whether the message is from the bot
                                     - message: the text of the message
         """
-        user = self._get_user(telegram_id)
+        user = self.get_user(telegram_id)
 
         try:
             current_conversation = CurrentConversation.objects.get(user=user)
@@ -45,7 +45,7 @@ class SQLiteDatabase(object):
 
         return messages
 
-    def _get_user(self, telegram_id: int) -> User | int:
+    def get_user(self, telegram_id: int) -> User | int:
         """Retrieve a User object from the database for a given user_id. If the
         user does not exist, create a new user.
 
@@ -112,7 +112,7 @@ class SQLiteDatabase(object):
             int: 0 if the conversation is successfully created and saved, or -1 if an error occurs.
         """
         try:
-            user = self._get_user(user_id)
+            user = self.get_user(user_id)
             if isinstance(user, User):
                 conversation_id = self._get_current_conversation(user, message)
                 if conversation_id <= ErrorCodes.exceptions.value:
@@ -167,7 +167,7 @@ class SQLiteDatabase(object):
             int: 0 if the image is successfully created and saved, or -1 if an error occurs.
         """
         try:
-            user = self._get_user(telegram_id)
+            user = self.get_user(telegram_id)
             image = UserImages(
                 user=user,
                 image_caption=image_caption,
@@ -240,7 +240,7 @@ class SQLiteDatabase(object):
         Returns:
             ConversationResult: The result of the conversation creation operation.
         """
-        user = self._get_user(telegram_id)
+        user = self.get_user(telegram_id)
 
         conversation = Conversation(user=user, title=title)
         try:
@@ -280,7 +280,7 @@ class SQLiteDatabase(object):
         Returns:
             ConversationResult: The result of the conversation creation operation.
         """
-        user = self._get_user(telegram_id)
+        user = self.get_user(telegram_id)
 
         try:
             CurrentConversation.objects.get(user=user).delete()
@@ -299,7 +299,7 @@ class SQLiteDatabase(object):
         Returns:
             dict: A dictionary containing the paginated conversations and pagination details.
         """
-        user = self._get_user(telegram_id)
+        user = self.get_user(telegram_id)
 
         # Retrieve the conversations for the given user
         conversations = Conversation.objects.filter(user=user).order_by("-start_time")
