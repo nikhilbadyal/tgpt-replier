@@ -236,7 +236,7 @@ class SQLiteDatabase(object):
             title (str): The title of the new conversation.
 
         Returns:
-            ConversationResult: The result of the conversation creation operation.
+            int: The result of the conversation creation operation.
         """
         user = self.get_user(telegram_id)
 
@@ -250,18 +250,16 @@ class SQLiteDatabase(object):
             return ErrorCodes.exceptions.value
 
         try:
-            current_conversation = CurrentConversation.objects.get(user=user)
-            current_conversation.conversation = conversation
-        except CurrentConversation.DoesNotExist:
-            current_conversation = CurrentConversation(
-                user=user, conversation=conversation
+            current_conversation, created = CurrentConversation.objects.get_or_create(
+                user=user, defaults={"conversation": conversation}
             )
+            if not created:
+                current_conversation.conversation = conversation
+                current_conversation.save()
 
-        try:
-            current_conversation.save()
         except Exception as e:
             logger.error(
-                f"An error occurred while saving current conversation to the database: {e}"
+                f"An error occurred while getting or creating current conversation: {e}"
             )
             conversation.delete()
             return ErrorCodes.exceptions.value
