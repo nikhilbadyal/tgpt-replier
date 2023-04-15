@@ -175,7 +175,7 @@ class SQLiteDatabase(object):
                 from_bot=True,
             )
             image.save()
-            return 0
+            return ErrorCodes.success.value
         except Exception as e:
             logger.error(f"Unable to save image {e}")
             return ErrorCodes.exceptions.value
