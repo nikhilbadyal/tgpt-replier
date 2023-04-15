@@ -93,6 +93,9 @@ class Conversation(models.Model):
     # Start time of the conversation
     start_time = models.DateTimeField(auto_now_add=True, editable=False)
 
+    # Conversation settings, stored as a JSON object
+    settings = models.JSONField(default=dict)
+
     class Meta:
         # Database table name
         db_table = "conversation"
