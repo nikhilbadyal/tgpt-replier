@@ -335,7 +335,7 @@ class CreateConversation(TestCase):
         controller = SQLiteDatabase()
 
         # Use patch to modify the behavior of _get_user
-        with patch.object(controller, "_get_user") as mock_get_user:
+        with patch.object(controller, "get_user") as mock_get_user:
             mock_get_user.return_value = ErrorCodes.exceptions.value
 
             # Call the _create_conversation function
