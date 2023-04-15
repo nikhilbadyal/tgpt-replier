@@ -51,5 +51,5 @@ async def handle_settings_command(event: events.NewMessage.Event) -> None:
     else:
         await event.reply(
             f"Invalid setting name `{setting_name}`. Please provide a valid setting name.",
-            parse_mode="markdown"
+            parse_mode="markdown",
         )
