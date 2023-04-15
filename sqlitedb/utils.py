@@ -1,6 +1,10 @@
 """Utility class."""
 from enum import Enum
 
+test_message = "Test message"
+test_conversation = "Test Conversation"
+test_title = "Test Title"
+
 
 class ErrorCodes(Enum):
     """List of error codes."""

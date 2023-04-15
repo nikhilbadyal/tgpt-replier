@@ -57,9 +57,8 @@ async def handle_reset_confirm_response(
         logger.debug(f"Removed {num_conv_deleted} convo and {num_img_deleted} images")
 
         # Send a success message if items were deleted, otherwise send an error message
-        if (
-            num_conv_deleted > ErrorCodes.exceptions.value
-            and num_img_deleted > ErrorCodes.exceptions.value
+        if not isinstance(num_conv_deleted, ErrorCodes) and not isinstance(
+            num_img_deleted, ErrorCodes
         ):
             await event.edit(cleanup_success)
         else:

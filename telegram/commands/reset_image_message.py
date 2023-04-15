@@ -79,7 +79,7 @@ async def handle_reset_image_message_confirm_response(
             logger.debug(f"Removed {result} {request}")
 
             # Send a success message if items were deleted, otherwise send an error message
-            if isinstance(result, int) and result > ErrorCodes.exceptions.value:
+            if not isinstance(result, ErrorCodes):
                 await event.edit(cleanup_success)
             else:
                 await event.edit(something_bad_occurred)

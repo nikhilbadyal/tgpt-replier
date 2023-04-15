@@ -5,13 +5,14 @@ from django.db import IntegrityError
 from django.utils import timezone
 
 from sqlitedb.models import Conversation, User, UserConversations
+from sqlitedb.utils import test_message
 
 
 @pytest.mark.django_db
 def test_user_conversation_creation(user: User, conversation: Conversation) -> None:
     """Test creating a user conversation."""
     # Create a user conversation
-    message = "Test message"
+    message = test_message
     from_bot = False
     user_conversation = UserConversations.objects.create(
         user=user,
@@ -38,7 +39,7 @@ def test_user_conversation_str(user: User, conversation: Conversation) -> None:
     """Test the string representation of a user conversation."""
     user_conversation = UserConversations.objects.create(
         user=user,
-        message="Test message",
+        message=test_message,
         from_bot=False,
         conversation=conversation,
     )
@@ -57,7 +58,7 @@ def test_user_conversation_from_bot(user: User, conversation: Conversation) -> N
     with pytest.raises(IntegrityError):
         UserConversations.objects.create(
             user=user,
-            message="Test message",
+            message=test_message,
             conversation=conversation,
         )
 
@@ -84,7 +85,7 @@ def test_user_conversation_message_date_auto_generated(
     """Test that the message date is auto-generated if not provided."""
     user_conversation = UserConversations.objects.create(
         user=user,
-        message="Test message",
+        message=test_message,
         from_bot=False,
         conversation=conversation,
     )
@@ -96,7 +97,7 @@ def test_user_conversation_update(user: User, conversation: Conversation) -> Non
     """Test that we can update a user conversation."""
     user_conversation = UserConversations.objects.create(
         user=user,
-        message="Test message",
+        message=test_message,
         from_bot=False,
         conversation=conversation,
     )
@@ -113,7 +114,7 @@ def test_user_conversation_delete_cascade(
     conversations."""
     user_conversation = UserConversations.objects.create(
         user=user,
-        message="Test message",
+        message=test_message,
         from_bot=False,
         conversation=conversation,
     )

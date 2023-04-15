@@ -1,5 +1,5 @@
 """Utility class."""
-import random
+import secrets
 import string
 from enum import Enum
 
@@ -34,7 +34,7 @@ def generate_random_string(length: int = 10) -> str:
     letters = string.ascii_lowercase
 
     # Use a loop to randomly select characters from the string to build the result string
-    result_str = "".join(random.choice(letters) for _ in range(length))
+    result_str = "".join(secrets.choice(letters) for _ in range(length))
 
     # Return the result string
     return result_str

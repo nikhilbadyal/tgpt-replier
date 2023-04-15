@@ -6,6 +6,8 @@ from loguru import logger
 from telethon import events
 from telethon.tl.types import User
 
+from sqlitedb.utils import ErrorCodes
+
 # Import some helper functions
 from telegram.commands.strings import something_bad_occurred
 from telegram.commands.utils import get_regex, get_user
@@ -38,7 +40,7 @@ async def handle_any_message(event: events.NewMessage.Event) -> None:
                 # Generate a response based on the user and the message text
                 message = await sync_to_async(gpt.chat)(user, event.message.text)
                 # If the response is an integer, send a cleanup message instead
-                if isinstance(message, int):
+                if isinstance(message, ErrorCodes):
                     await event.respond(something_bad_occurred)
                 # Otherwise, send the response
                 else:

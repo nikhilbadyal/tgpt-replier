@@ -5,13 +5,14 @@ import pytest
 from django.utils import timezone
 
 from sqlitedb.models import Conversation, User
+from sqlitedb.utils import test_conversation
 
 
 @pytest.mark.django_db
 def test_conversation_creation(user: User) -> None:
     """Test creating a conversation for a user."""
     # Create a conversation
-    title = "Test Conversation"
+    title = test_conversation
     conversation = Conversation.objects.create(user=user, title=title)
 
     # Check that the conversation was created
@@ -29,7 +30,7 @@ def test_conversation_creation(user: User) -> None:
 @pytest.mark.django_db
 def test_conversation_str(user: User) -> None:
     """Test the string representation of a conversation."""
-    conversation = Conversation.objects.create(user=user, title="Test Conversation")
+    conversation = Conversation.objects.create(user=user, title=test_conversation)
     assert (
         str(conversation) == f"Conversation(id={conversation.id}, user={user}, "
         f"title=Test Conversation, start_time={conversation.start_time})"
@@ -48,7 +49,7 @@ def test_conversation_start_time_immutable(user: User) -> None:
     """Test that the start time of a conversation is immutable."""
     conversation = Conversation.objects.create(user=user)
     start_time = conversation.start_time
-    conversation.title = "Test Conversation"
+    conversation.title = test_conversation
     conversation.save()
     assert conversation.start_time == start_time
 

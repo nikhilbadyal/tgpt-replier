@@ -6,6 +6,7 @@ import pytest
 from django.utils import timezone
 
 from sqlitedb.models import Conversation, CurrentConversation, User, UserConversations
+from sqlitedb.utils import test_conversation
 
 
 @pytest.fixture
@@ -20,7 +21,7 @@ def conversation(user: User) -> Conversation:
     """Create a test conversation."""
     conversation = Conversation.objects.create(
         user=user,
-        title="Test Conversation",
+        title=test_conversation,
         start_time=timezone.now(),
     )
     return conversation

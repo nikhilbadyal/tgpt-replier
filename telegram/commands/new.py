@@ -49,7 +49,7 @@ async def handle_new_command(event: events.NewMessage.Event) -> None:
 
     # Send a success message if the conversation was initiated successfully, otherwise send an error message
     success = "Initiated new conversation."
-    if status > ErrorCodes.exceptions.value:
+    if isinstance(status, ErrorCodes):
         await event.respond(success)
     else:
         await event.respond(something_bad_occurred)
