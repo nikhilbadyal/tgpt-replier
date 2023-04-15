@@ -16,6 +16,7 @@ class SupportedCommands(Enum):
     RESET_IMAGES: str = "/resetimages"
     RESET: str = "/reset"
     NEW: str = "/new"
+    LIST: str = "/list"
 
     @classmethod
     def get_values(cls) -> List[str]:

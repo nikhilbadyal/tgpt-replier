@@ -1,6 +1,7 @@
 """SQLite database to store messages."""
 from typing import Any, Tuple
 
+from django.core.paginator import EmptyPage, PageNotAnInteger, Paginator
 from loguru import logger
 
 from chatgpt.chatgpt import ChatGPT
@@ -286,3 +287,45 @@ class SQLiteDatabase(object):
         except CurrentConversation.DoesNotExist:
             logger.info(f"No current conversation for user {user}")
         return ErrorCodes.success.value
+
+    def get_user_conversations(self, telegram_id: int, page: int, per_page: int) -> Any:
+        """Return a paginated list of conversations for a given user.
+
+        Args:
+            telegram_id (int): The ID of the user.
+            page (int): The current page number.
+            per_page (int): The number of conversations to display per page.
+
+        Returns:
+            dict: A dictionary containing the paginated conversations and pagination details.
+        """
+        user = self._get_user(telegram_id)
+
+        # Retrieve the conversations for the given user
+        conversations = Conversation.objects.filter(user=user).order_by("-start_time")
+
+        # Create a Paginator object
+        paginator = Paginator(conversations, per_page)
+
+        # Get the paginated conversations
+        try:
+            paginated_conversations = paginator.page(page)
+        except PageNotAnInteger:
+            # If the page is not an integer, show the first page
+            paginated_conversations = paginator.page(1)
+        except EmptyPage:
+            # If the page is out of range, show the last available page
+            paginated_conversations = paginator.page(paginator.num_pages)
+
+        conversation_len = len(paginated_conversations)
+        logger.debug(f"Found {conversation_len} conversations.")
+
+        # Return the paginated conversations and pagination details
+        return {
+            "conversations": paginated_conversations,
+            "total_conversations": paginator.count,
+            "total_pages": paginator.num_pages,
+            "current_page": paginated_conversations.number,
+            "has_previous": paginated_conversations.has_previous(),
+            "has_next": paginated_conversations.has_next(),
+        }
