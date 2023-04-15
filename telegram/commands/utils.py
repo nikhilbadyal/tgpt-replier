@@ -64,3 +64,9 @@ def get_regex() -> str:
     # Exclude any message that starts with one of the supported commands using negative lookahead
     pattern = r"^(?!(%s))[^/].*" % "|".join(SupportedCommands.get_values())
     return pattern
+
+
+class UserSettings(Enum):
+    """User Settings."""
+
+    PAGE_SIZE: str = "page_size"

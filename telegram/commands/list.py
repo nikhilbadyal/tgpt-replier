@@ -46,8 +46,14 @@ async def send_paginated_conversations(
     """
     from main import db
 
+    # Fetch user settings
+    user = await sync_to_async(db.get_user)(telegram_id)
+    user_settings = user.settings
+
+    page_size = user_settings.get("page_size", PAGE_SIZE)
+
     result = await sync_to_async(db.get_user_conversations)(
-        telegram_id, page, PAGE_SIZE
+        telegram_id, page, page_size
     )
 
     response = "**Conversations:**\n"
