@@ -56,6 +56,9 @@ class User(models.Model):
     # Date and time when the user details was modified , auto-generated
     last_updated = models.DateTimeField(auto_now=True)
 
+    # Conversation settings, stored as a JSON object
+    settings = models.JSONField(default=dict)
+
     # Use custom manager for this model
     objects = UserManager()
 
@@ -92,9 +95,6 @@ class Conversation(models.Model):
 
     # Start time of the conversation
     start_time = models.DateTimeField(auto_now_add=True, editable=False)
-
-    # Conversation settings, stored as a JSON object
-    settings = models.JSONField(default=dict)
 
     class Meta:
         # Database table name
