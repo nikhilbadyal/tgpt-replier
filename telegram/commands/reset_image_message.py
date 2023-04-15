@@ -55,6 +55,7 @@ async def handle_reset_image_message_confirm_response(
     Returns:
         None: This function doesn't return anything.
     """
+    await event.answer()
     logger.debug("Received reset image/message callback")
     if event.data == reset_yes_data:
         # Import the main function for cleaning up user data
