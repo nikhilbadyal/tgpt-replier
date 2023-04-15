@@ -330,7 +330,9 @@ class SQLiteDatabase(object):
             "has_next": paginated_conversations.has_next(),
         }
 
-    def get_conversation(self, conversation_id: int,user:User) -> Optional[Conversation]:
+    def get_conversation(
+        self, conversation_id: int, user: User
+    ) -> Optional[Conversation]:
         """Get the Conversation object by its ID.
 
         Args:
@@ -341,8 +343,8 @@ class SQLiteDatabase(object):
             Optional[Conversation]: The conversation object if it exists, otherwise None.
         """
         try:
-            conversation = Conversation.objects.get(id=conversation_id,user=user)
-            logger.debug(f'Got {conversation}')
+            conversation = Conversation.objects.get(id=conversation_id, user=user)
+            logger.debug(f"Got {conversation}")
             return conversation
         except Conversation.DoesNotExist:
             return None
