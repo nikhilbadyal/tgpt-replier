@@ -38,9 +38,11 @@ class SQLiteDatabase(object):
             # TODO: Handle properly
             return []
 
-        messages = UserConversations.objects.filter(
-            user=user, conversation=current_conversation.conversation
-        ).values("from_bot", "message")
+        messages = (
+            UserConversations.objects.select_related("conversation")
+            .filter(user=user, conversation=current_conversation.conversation)
+            .values("from_bot", "message")
+        )
         messages = messages.order_by("message_date")
 
         return messages
@@ -298,7 +300,11 @@ class SQLiteDatabase(object):
         user = self.get_user(telegram_id)
 
         # Retrieve the conversations for the given user
-        conversations = Conversation.objects.filter(user=user).order_by("-start_time")
+        conversations = (
+            Conversation.objects.only("id", "title", "start_time")
+            .filter(user=user)
+            .order_by("-start_time")
+        )
 
         # Create a Paginator object
         paginator = Paginator(conversations, per_page)
@@ -339,7 +345,9 @@ class SQLiteDatabase(object):
             Optional[Conversation]: The conversation object if it exists, otherwise None.
         """
         try:
-            conversation = Conversation.objects.get(id=conversation_id, user=user)
+            conversation = Conversation.objects.only("id", "title").get(
+                id=conversation_id, user=user
+            )
             logger.debug(f"Got {conversation}")
             return conversation
         except Conversation.DoesNotExist:
