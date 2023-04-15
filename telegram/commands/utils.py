@@ -20,6 +20,7 @@ class SupportedCommands(Enum):
     NEW: str = "/new"
     LIST: str = "/list"
     SETTINGS: str = "/settings"
+    SWITCH: str = "/switch"
 
     @classmethod
     def get_values(cls) -> List[str]:

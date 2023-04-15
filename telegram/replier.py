@@ -9,6 +9,7 @@ from telegram.commands.reset import add_reset_handlers
 from telegram.commands.reset_image_message import add_reset_image_message_handlers
 from telegram.commands.settings import add_settings_handlers
 from telegram.commands.start import add_start_handlers
+from telegram.commands.switch import add_switch_handler
 
 
 class Telegram(object):
@@ -51,6 +52,7 @@ class Telegram(object):
         add_start_handlers(self.client)
         add_list_handlers(self.client)
         add_settings_handlers(self.client)
+        add_switch_handler(self.client)
         self.client.add_event_handler(image.handle_image_command)
         self.client.add_event_handler(new.handle_new_command)
         self.client.add_event_handler(general.handle_any_message)

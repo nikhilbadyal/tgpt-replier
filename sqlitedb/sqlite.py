@@ -1,5 +1,5 @@
 """SQLite database to store messages."""
-from typing import Any, Tuple
+from typing import Any, Optional, Tuple
 
 from django.core.paginator import EmptyPage, PageNotAnInteger, Paginator
 from loguru import logger
@@ -329,3 +329,34 @@ class SQLiteDatabase(object):
             "has_previous": paginated_conversations.has_previous(),
             "has_next": paginated_conversations.has_next(),
         }
+
+    def get_conversation(self, conversation_id: int,user:User) -> Optional[Conversation]:
+        """Get the Conversation object by its ID.
+
+        Args:
+            conversation_id (int): The ID of the conversation.
+            user (User): User to get the Conversation
+
+        Returns:
+            Optional[Conversation]: The conversation object if it exists, otherwise None.
+        """
+        try:
+            conversation = Conversation.objects.get(id=conversation_id,user=user)
+            logger.debug(f'Got {conversation}')
+            return conversation
+        except Conversation.DoesNotExist:
+            return None
+
+    def set_active_conversation(self, user: User, conversation: Conversation) -> None:
+        """Set the active conversation for a user.
+
+        Args:
+            user (User): The user whose active conversation is to be set.
+            conversation (Conversation): The conversation to be set as active.
+            Pass None to unset the active conversation.
+        """
+        current_conversation, created = CurrentConversation.objects.get_or_create(
+            user=user
+        )
+        current_conversation.conversation = conversation
+        current_conversation.save()
