@@ -35,7 +35,6 @@ class SQLiteDatabase(object):
             current_conversation = CurrentConversation.objects.get(user=user)
         except CurrentConversation.DoesNotExist:
             logger.error(f"No current conversation found for user with ID {user}.")
-            # TODO: Handle properly
             return []
 
         messages = (
