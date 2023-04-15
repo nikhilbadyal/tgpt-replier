@@ -1,5 +1,5 @@
 """SQLite database to store messages."""
-from typing import Any, Optional, Tuple
+from typing import Any, Optional, Tuple, Union
 
 from django.core.paginator import EmptyPage, PageNotAnInteger, Paginator
 from loguru import logger
@@ -45,7 +45,7 @@ class SQLiteDatabase(object):
 
         return messages
 
-    def get_user(self, telegram_id: int) -> User | int:
+    def get_user(self, telegram_id: int) -> Union[User, int]:
         """Retrieve a User object from the database for a given user_id. If the
         user does not exist, create a new user.
 
@@ -56,17 +56,15 @@ class SQLiteDatabase(object):
             Union[User, int]: The User object corresponding to the specified user ID, or -1 if an error occurs.
         """
         try:
-            user: User = User.objects.get(telegram_id=telegram_id)
-        except User.DoesNotExist:
-            # User does not exist, create a new user
-            try:
-                new_user = User(telegram_id=telegram_id, name=f"User {telegram_id}")
-                new_user.save()
-                return new_user
-            except Exception as e:
-                logger.error(f"Unable to create new user {e}")
-                return ErrorCodes.exceptions.value
-        return user
+            user, created = User.objects.get_or_create(
+                telegram_id=telegram_id, defaults={"name": f"User {telegram_id}"}
+            )
+            if isinstance(user, User):
+                return user
+            raise ValueError("Not a user")
+        except Exception as e:
+            logger.error(f"Unable to get or create user: {e}")
+            return ErrorCodes.exceptions.value
 
     def _get_current_conversation(self, user: User, message: str) -> int:
         """Retrieve a CurrentConversation object from the database given a User
