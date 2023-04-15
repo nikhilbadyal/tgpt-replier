@@ -12,7 +12,7 @@ def init_django() -> None:
     import django
     from django.conf import settings
 
-    BASE_DIR = Path(__file__).resolve().parent
+    base_dir = Path(__file__).resolve().parent
 
     if settings.configured:
         return
@@ -24,7 +24,7 @@ def init_django() -> None:
         DATABASES={
             "default": {
                 "ENGINE": "django.db.backends.sqlite3",
-                "NAME": BASE_DIR / f"{Path(__file__).resolve().parent.name}.db",
+                "NAME": base_dir / f"{Path(__file__).resolve().parent.name}.db",
             }
         },
     )
