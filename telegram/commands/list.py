@@ -5,9 +5,7 @@ from asgiref.sync import sync_to_async
 from loguru import logger
 from telethon import Button, TelegramClient, events
 
-from telegram.commands.utils import SupportedCommands
-
-PAGE_SIZE = 10  # Number of conversations per page
+from telegram.commands.utils import PAGE_SIZE, SupportedCommands
 
 
 def add_list_handlers(client: TelegramClient) -> None:
