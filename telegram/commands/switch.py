@@ -13,7 +13,7 @@ def add_switch_handler(client: TelegramClient) -> None:
 
 
 # Register the function to handle the /switch command
-@events.register(events.NewMessage(pattern=f"^{SupportedCommands.SWITCH.value}\\s+(\\d+)$"))  # type: ignore
+@events.register(events.NewMessage(pattern=f"^{SupportedCommands.SWITCH.value}\\s*(\\d*)$"))  # type: ignore
 async def handle_switch_command(event: events.NewMessage.Event) -> None:
     """Event handler for the /switch command.
 
@@ -25,9 +25,9 @@ async def handle_switch_command(event: events.NewMessage.Event) -> None:
 
     conversation_id = event.pattern_match.group(1)
     if not conversation_id:
-        await event.reply(
-            "Please provide the conversation ID you want to switch to. Example: /switch 42"
-        )
+        response = "To switch to other conversation, use the following command format:\n`/switch <conversation_id>`\n\n"
+        response += "**For example**:\n`/switch 42`\n\n"
+        await event.reply(response)
         return
 
     try:
