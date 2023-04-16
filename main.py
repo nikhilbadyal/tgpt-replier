@@ -14,4 +14,4 @@ if __name__ == "__main__":
     if env.str("BOT_TOKEN", None):
         Telegram(project_name).bot_listener()
     else:
-        logger.info("No token provided.")
+        logger.info("No bot token provided.")
