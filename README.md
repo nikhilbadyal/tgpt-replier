@@ -1,9 +1,9 @@
-## Telegram Chatbot with Chat GPT and DALL-E
+# Telegram Chatbot with Chat GPT and DALL-E
 
 This is a simple Telegram chatbot that listens for incoming messages and uses Chat GPT to generate replies. The bot is
 built using Python and the Telegram Bot API. In addition, this bot also uses DALL-E to generate images from text input.
 
-### Installation
+## Installation
 1. Clone the repository to your local machine.
     ```bash
     git clone https://github.com/nikhilbadyal/tgpt-replier.git
