@@ -58,12 +58,11 @@ class SQLiteDatabase(object):
             Union[User, int]: The User object corresponding to the specified user ID, or -1 if an error occurs.
         """
         try:
+            user: User
             user, created = User.objects.get_or_create(
                 telegram_id=telegram_id, defaults={"name": f"User {telegram_id}"}
             )
-            if isinstance(user, User):
-                return user
-            raise ValueError("Not a user")
+            return user
         except Exception as e:
             logger.error(f"Unable to get or create user: {e}")
             return ErrorCodes.exceptions
@@ -327,9 +326,11 @@ class SQLiteDatabase(object):
         try:
             paginated_conversations = paginator.page(page)
         except PageNotAnInteger:
+            logger.debug("Not a valid page number")
             # If the page is not an integer, show the first page
             paginated_conversations = paginator.page(1)
         except EmptyPage:
+            logger.debug("Empty current page")
             # If the page is out of range, show the last available page
             paginated_conversations = paginator.page(paginator.num_pages)
 
