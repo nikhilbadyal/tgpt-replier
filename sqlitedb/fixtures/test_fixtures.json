@@ -44,7 +44,16 @@
     "pk": 3,
     "fields": {
       "user": 2,
-      "title": "Sample Conversation",
+      "title": "Sample Conversation 3",
+      "start_time": "2023-04-14T12:05:00"
+    }
+  },
+  {
+    "model": "sqlitedb.conversation",
+    "pk": 4,
+    "fields": {
+      "user": 1,
+      "title": "Sample Conversation 4",
       "start_time": "2023-04-14T12:05:00"
     }
   },
@@ -132,5 +141,38 @@
       "conversation": 3,
       "message_date": "2023-04-18T12:06:00"
     }
+  },
+  {
+    "model": "sqlitedb.userimages",
+    "pk": 1,
+    "fields": {
+      "user": 1,
+      "image_caption": "A beautiful sunset",
+      "image_url": "https://example.com/images/sunset.jpg",
+      "from_bot": false,
+      "message_date": "2023-04-16T10:00:00"
+    }
+  },
+  {
+    "model": "sqlitedb.userimages",
+    "pk": 2,
+    "fields": {
+      "user": 2,
+      "image_caption": null,
+      "image_url": "https://example.com/images/cat.jpg",
+      "from_bot": true,
+      "message_date": "2023-04-16T11:00:00"
+    }
+  },{
+  "model": "sqlitedb.userimages",
+  "pk": 3,
+  "fields": {
+    "user": 1,
+    "image_caption": "A delicious pizza",
+    "image_url": "https://example.com/images/pizza.jpg",
+    "from_bot": false,
+    "message_date": "2023-04-17T14:00:00"
   }
+}
+
 ]
