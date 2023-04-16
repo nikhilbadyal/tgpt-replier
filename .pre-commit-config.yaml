@@ -60,4 +60,4 @@ repos:
         args:
           - '--strict'
           - '--config=setup.cfg'
-        additional_dependencies: [ openai,types-requests,django-stubs, pytest-mypy-plugins,pytest-stub        ]
+        additional_dependencies: [ openai,types-requests,django-stubs, pytest-mypy-plugins,pytest-stub,watchdog        ]
