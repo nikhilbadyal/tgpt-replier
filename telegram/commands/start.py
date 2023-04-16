@@ -49,5 +49,6 @@ async def handle_start_message(event: events.NewMessage.Event) -> None:
         await event.respond(something_bad_occurred)
     # Otherwise, extract the pun from the response and send it back to the user
     else:
-        result = reply[len(prefix) :]
+        prefix_len = len(prefix)
+        result = reply[prefix_len:]
         await event.respond(result)

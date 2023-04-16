@@ -38,7 +38,8 @@ async def handle_new_command(event: events.NewMessage.Event) -> None:
     prefix = prefix.ljust(len(prefix) + 1)
 
     # Extract the image query from the message text
-    title = event.message.text[len(prefix) :]
+    prefix_len = len(prefix)
+    title = event.message.text[prefix_len:]
     if len(title) == 0:
         title = None
     # Call the function to initiate a new conversation

@@ -60,7 +60,8 @@ async def handle_image_command(event: events.NewMessage.Event) -> None:
     telegram_user: User = await get_user(event)
 
     # Extract the image query from the message text
-    result = event.message.text[len(prefix) :]
+    prefix_len = len(prefix)
+    result = event.message.text[prefix_len:]
 
     # Generate an image URL based on the query
     if result:
