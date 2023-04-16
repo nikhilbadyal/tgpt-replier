@@ -29,7 +29,7 @@ async def send_image_from_url(
         None: This function doesn't return anything.
     """
 
-    response = requests.get(url)
+    response = requests.get(url, timeout=20)
     file_bytes = response.content
     await event.send_file(entity=user, file=file_bytes, caption=caption)
 
