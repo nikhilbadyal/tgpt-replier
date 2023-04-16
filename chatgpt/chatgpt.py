@@ -1,5 +1,5 @@
 """Auth Open API."""
-from typing import Dict, List, Tuple, Union
+from typing import Dict, List, Optional, Tuple, Union
 
 import openai
 from loguru import logger
@@ -180,7 +180,9 @@ class ChatGPT(object):
             logger.error(f"Not a valid choice {data}")
             return ErrorCodes.exceptions
 
-    def initiate_new_conversation(self, telegram_user: User, title: str) -> ErrorCodes:
+    def initiate_new_conversation(
+        self, telegram_user: User, title: str
+    ) -> Optional[ErrorCodes]:
         """Initiate a new conversation."""
         from main import db
 
@@ -189,4 +191,5 @@ class ChatGPT(object):
             return db.initiate_new_conversation(telegram_user.id, title)
         else:
             logger.debug("Initializing new conversation without title")
-            return db.initiate_empty_new_conversation(telegram_user.id)
+            db.initiate_empty_new_conversation(telegram_user.id)
+            return None

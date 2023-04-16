@@ -280,7 +280,7 @@ class CreateConversation(TestCase):
         result = controller._create_conversation(user.telegram_id, test_message, False)
 
         # Check if the conversation was created successfully
-        self.assertEqual(result, ErrorCodes.success)
+        self.assertIsNone(result)
 
         # Verify if the conversation was saved in the database
         saved_conversation = UserConversations.objects.get(
@@ -386,7 +386,7 @@ class CreateConversation(TestCase):
         total_messages_by_user_before = len(messages_by_user_before)
         total_messages_by_bot_before = len(messages_by_bot_before)
         status = controller.insert_message_from_user("From User", telegram_id)
-        assert status == ErrorCodes.success
+        assert status is None
         messages_by_user_after = UserConversations.objects.filter(
             user__telegram_id=telegram_id, from_bot=False
         )
@@ -417,7 +417,7 @@ class CreateConversation(TestCase):
         total_messages_by_user_before = len(messages_by_user_before)
         total_messages_by_bot_before = len(messages_by_bot_before)
         status = controller.insert_message_from_gpt("From GPT", telegram_id)
-        assert status == ErrorCodes.success
+        assert status is None
         messages_by_user_after = UserConversations.objects.filter(
             user__telegram_id=telegram_id, from_bot=False
         )
@@ -486,7 +486,7 @@ class TestInitiateNewConversation(TestCase):
         result = controller.initiate_new_conversation(telegram_id, test_title)
 
         # Check if the function returns a success value
-        self.assertEqual(result, ErrorCodes.success)
+        assert result is None
 
         # Check if the new conversation is created in the database
         conversation = Conversation.objects.get(user=user, title=test_title)

@@ -47,10 +47,11 @@ async def handle_any_message(event: events.NewMessage.Event) -> None:
                     await event.respond(message)
             # If the message doesn't contain text, send a cleanup message
             else:
+                logger.debug("No text received in event.")
                 await event.respond(something_bad_occurred)
         # If the user cannot be retrieved or is a bot, log an error
         else:
             logger.info("Cannot get Entity or a bot")
     # If the message is not a private chat, log a message
     else:
-        logger.info("Not a private message")
+        logger.debug("Not a private message")

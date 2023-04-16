@@ -9,7 +9,6 @@ test_title = "Test Title"
 class ErrorCodes(Enum):
     """List of error codes."""
 
-    success = 0
     exceptions = -1
 
 
