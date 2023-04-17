@@ -335,7 +335,7 @@ class SQLiteDatabase(object):
             paginated_conversations = paginator.page(paginator.num_pages)
 
         conversation_len = len(paginated_conversations)
-        logger.debug(f"Found {conversation_len} conversations.")
+        logger.debug(f"Found {conversation_len} messages in conversation.")
 
         # Return the paginated conversations and pagination details
         return {
@@ -381,3 +381,53 @@ class SQLiteDatabase(object):
         )
         current_conversation.conversation = conversation
         current_conversation.save()
+
+    def get_conversation_messages(
+        self, telegram_id: int, page: int, per_page: int
+    ) -> Any:
+        """Return a paginated list of conversations for a given user.
+
+        Args:
+            telegram_id (int): The ID of the user.
+            page (int): The current page number.
+            per_page (int): The number of conversations to display per page.
+
+        Returns:
+            dict: A dictionary containing the paginated conversations and pagination details.
+        """
+        user = self.get_user(telegram_id)
+
+        # Retrieve the conversations for the given user
+        conversations = (
+            UserConversations.objects.only("message", "from_bot")
+            .filter(user=user)
+            .order_by("message_date")
+        )
+
+        # Create a Paginator object
+        paginator = Paginator(conversations, per_page)
+
+        # Get the paginated conversations
+        try:
+            paginated_conversations = paginator.page(page)
+        except PageNotAnInteger:
+            logger.debug("Not a valid page number")
+            # If the page is not an integer, show the first page
+            paginated_conversations = paginator.page(1)
+        except EmptyPage:
+            logger.debug("Empty current page")
+            # If the page is out of range, show the last available page
+            paginated_conversations = paginator.page(paginator.num_pages)
+
+        conversation_len = len(paginated_conversations)
+        logger.debug(f"Found {conversation_len} conversations.")
+
+        # Return the paginated conversations and pagination details
+        return {
+            "conversations": paginated_conversations,
+            "total_conversations": paginator.count,
+            "total_pages": paginator.num_pages,
+            "current_page": paginated_conversations.number,
+            "has_previous": paginated_conversations.has_previous(),
+            "has_next": paginated_conversations.has_next(),
+        }

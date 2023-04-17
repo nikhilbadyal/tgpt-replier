@@ -6,6 +6,7 @@ from telethon import TelegramClient
 from telegram.commands import general, image, new
 from telegram.commands.chat import add_chat_handler
 from telegram.commands.list import add_list_handlers
+from telegram.commands.print import add_print_handlers
 from telegram.commands.reset import add_reset_handlers
 from telegram.commands.reset_image_message import add_reset_image_message_handlers
 from telegram.commands.settings import add_settings_handlers
@@ -55,6 +56,7 @@ class Telegram(object):
         add_settings_handlers(self.client)
         add_switch_handler(self.client)
         add_chat_handler(self.client)
+        add_print_handlers(self.client)
         self.client.add_event_handler(image.handle_image_command)
         self.client.add_event_handler(new.handle_new_command)
         self.client.add_event_handler(general.handle_any_message)

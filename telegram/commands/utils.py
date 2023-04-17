@@ -23,6 +23,7 @@ class SupportedCommands(Enum):
     SETTINGS: str = "/settings"
     SWITCH: str = "/switch"
     CHAT: str = "/chat"
+    PRINT: str = "/print"
 
     @classmethod
     def get_values(cls) -> List[str]:
