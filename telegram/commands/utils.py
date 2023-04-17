@@ -2,6 +2,7 @@
 from enum import Enum
 from typing import Any, List, Optional
 
+from loguru import logger
 from telethon import events
 from telethon.tl.types import User
 
@@ -21,6 +22,7 @@ class SupportedCommands(Enum):
     LIST: str = "/list"
     SETTINGS: str = "/settings"
     SWITCH: str = "/switch"
+    CHAT: str = "/chat"
 
     @classmethod
     def get_values(cls) -> List[str]:
@@ -53,7 +55,7 @@ async def get_user(event: events.NewMessage.Event) -> User:
         # Get the user entity from the peer ID of the message event, Uses cache
         user: User = await event.client.get_entity(event.peer_id)
     except (ValueError, AttributeError):
-        # If the peer ID is invalid, get the sender entity from the message event
+        logger.debug("Invalid Peer ID")
         user = await event.get_sender()
     return user
 
