@@ -33,7 +33,10 @@ async def handle_any_message(event: events.NewMessage.Event) -> None:
     user: User = await event.get_sender()
     if user and not user.bot:
         # Check if the message contains text
-        if event.message.text and event.message.text != SupportedCommands.CHAT.value:
+        if (
+            event.message.text.strip()
+            and event.message.text.strip() != SupportedCommands.CHAT.value
+        ):
             # Generate a response based on the user and the message text
             message = await sync_to_async(gpt.chat)(user, event.message.text)
             # If the response is an integer, send a cleanup message instead
