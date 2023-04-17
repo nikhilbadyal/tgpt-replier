@@ -12,6 +12,7 @@ def add_settings_handlers(client: TelegramClient) -> None:
     """Add /settings command Event Handler."""
     client.add_event_handler(handle_settings_command)
     client.add_event_handler(handle_settings_list_settings)
+    client.add_event_handler(handle_settings_current_settings)
 
 
 @events.register(events.CallbackQuery(pattern="list_settings"))  # type: ignore
@@ -28,6 +29,30 @@ async def handle_settings_list_settings(
     response = "**Available settings**:\n\n"
     for setting in UserSettings:
         response += f"- `{setting.name}`: {setting.description}\n"
+
+    await event.edit(response, parse_mode="markdown")
+
+
+@events.register(events.CallbackQuery(pattern="current_settings"))  # type: ignore
+async def handle_settings_current_settings(
+    event: events.callbackquery.CallbackQuery.Event,
+):
+    """Event handler for listing current settings.
+
+    Args:
+        event (CallbackQuery.Event): The callback query event.
+    """
+    await event.answer()
+    from main import db
+
+    response = "**Current settings**:\n\n"
+    telegram_id = event.query.user_id
+    user = await sync_to_async(db.get_user)(telegram_id)
+    settings = user.settings
+    for setting in settings:
+        setting_enum = UserSettings(setting)
+        description = setting_enum.description
+        response += f"- `{setting_enum} {settings[setting]}`: __{description}__\n"
 
     await event.edit(response, parse_mode="markdown")
 
@@ -50,7 +75,10 @@ async def handle_settings_command(event: events.NewMessage.Event) -> None:
             "Click the **List Settings** button below to see available settings."
         )
 
-        buttons = [Button.inline("List Settings", data="list_settings")]
+        buttons = [
+            Button.inline("List Settings", data="list_settings"),
+            Button.inline("Current Settings", data="current_settings"),
+        ]
 
         await event.reply(response, buttons=buttons, parse_mode="markdown")
         return
