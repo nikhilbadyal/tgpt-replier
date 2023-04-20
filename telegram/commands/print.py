@@ -62,7 +62,7 @@ async def display_paginated_messages(
 
     response = f"Messages from __Conversation {conversation_id}__\n\n"
 
-    for message in result["conversations"]:
+    for message in result["data"]:
         sender = "**Bot**" if message.from_bot else "**User**"
         response += f"{sender}: {message.message}\n"
 

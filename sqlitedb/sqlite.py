@@ -1,7 +1,8 @@
 """SQLite database to store messages."""
-from typing import Any, Optional, Tuple, Union
+from typing import Any, Dict, Optional, Tuple, TypeVar, Union
 
 from django.core.paginator import EmptyPage, PageNotAnInteger, Paginator
+from django.db.models import Model, QuerySet
 from loguru import logger
 
 from chatgpt.chatgpt import ChatGPT
@@ -13,6 +14,8 @@ from sqlitedb.models import (
     UserImages,
 )
 from sqlitedb.utils import ErrorCodes
+
+T = TypeVar("T", bound=Model)
 
 
 class SQLiteDatabase(object):
@@ -299,6 +302,39 @@ class SQLiteDatabase(object):
         except CurrentConversation.DoesNotExist:
             logger.info(f"No current conversation for user {user}")
 
+    def _paginate_queryset(
+        self, queryset: QuerySet[T], page: int, per_page: int
+    ) -> Dict[str, Any]:
+        """Helper function to paginate a given queryset.
+
+        Args:
+            queryset (QuerySet[T]): The queryset to be paginated.
+            page (int): The current page number.
+            per_page (int): The number of items to display per page.
+
+        Returns:
+            dict: A dictionary containing the paginated data and pagination details.
+        """
+        paginator = Paginator(queryset, per_page)
+
+        try:
+            paginated_data = paginator.page(page)
+        except PageNotAnInteger:
+            logger.debug(f"{page} is not a valid page number")
+            paginated_data = paginator.page(1)
+        except EmptyPage:
+            logger.debug(f"Empty {page} current page")
+            paginated_data = paginator.page(paginator.num_pages)
+
+        return {
+            "data": paginated_data,
+            "total_data": paginator.count,
+            "total_pages": paginator.num_pages,
+            "current_page": paginated_data.number,
+            "has_previous": paginated_data.has_previous(),
+            "has_next": paginated_data.has_next(),
+        }
+
     def get_user_conversations(self, telegram_id: int, page: int, per_page: int) -> Any:
         """Return a paginated list of conversations for a given user.
 
@@ -319,33 +355,8 @@ class SQLiteDatabase(object):
             .order_by("-start_time")
         )
 
-        # Create a Paginator object
-        paginator = Paginator(conversations, per_page)
-
-        # Get the paginated conversations
-        try:
-            paginated_conversations = paginator.page(page)
-        except PageNotAnInteger:
-            logger.debug("Not a valid page number")
-            # If the page is not an integer, show the first page
-            paginated_conversations = paginator.page(1)
-        except EmptyPage:
-            logger.debug("Empty current page")
-            # If the page is out of range, show the last available page
-            paginated_conversations = paginator.page(paginator.num_pages)
-
-        conversation_len = len(paginated_conversations)
-        logger.debug(f"Found {conversation_len} messages in conversation.")
-
-        # Return the paginated conversations and pagination details
-        return {
-            "conversations": paginated_conversations,
-            "total_conversations": paginator.count,
-            "total_pages": paginator.num_pages,
-            "current_page": paginated_conversations.number,
-            "has_previous": paginated_conversations.has_previous(),
-            "has_next": paginated_conversations.has_next(),
-        }
+        # Use the helper function to paginate the queryset
+        return self._paginate_queryset(conversations, page, per_page)
 
     def get_conversation(
         self, conversation_id: int, user: User
@@ -399,36 +410,11 @@ class SQLiteDatabase(object):
         user = self.get_user(telegram_id)
 
         # Retrieve the conversations for the given user
-        conversations = (
+        messages = (
             UserConversations.objects.only("message", "from_bot")
             .filter(user=user, conversation_id=conversation_id)
             .order_by("message_date")
         )
 
-        # Create a Paginator object
-        paginator = Paginator(conversations, per_page)
-
-        # Get the paginated conversations
-        try:
-            paginated_conversations = paginator.page(page)
-        except PageNotAnInteger:
-            logger.debug(f"{page} is not a valid page number")
-            # If the page is not an integer, show the first page
-            paginated_conversations = paginator.page(1)
-        except EmptyPage:
-            logger.debug(f"Empty {page} current page")
-            # If the page is out of range, show the last available page
-            paginated_conversations = paginator.page(paginator.num_pages)
-
-        conversation_len = len(paginated_conversations)
-        logger.debug(f"Found {conversation_len} conversations.")
-
-        # Return the paginated conversations and pagination details
-        return {
-            "conversations": paginated_conversations,
-            "total_conversations": paginator.count,
-            "total_pages": paginator.num_pages,
-            "current_page": paginated_conversations.number,
-            "has_previous": paginated_conversations.has_previous(),
-            "has_next": paginated_conversations.has_next(),
-        }
+        # Use the helper function to paginate the queryset
+        return self._paginate_queryset(messages, page, per_page)

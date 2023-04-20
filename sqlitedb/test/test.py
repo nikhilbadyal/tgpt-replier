@@ -633,13 +633,13 @@ class TestGetUserConversations(CustomTest):
             self.user.telegram_id, page=1, per_page=2
         )
         # Check the result
-        self.assertEqual(len(result["conversations"]), 2)
+        self.assertEqual(len(result["data"]), 2)
         assert result["has_next"] is True
         assert result["has_previous"] is False
         result = self.controller.get_user_conversations(
             self.user.telegram_id, page=2, per_page=2
         )
-        self.assertEqual(len(result["conversations"]), 1)
+        self.assertEqual(len(result["data"]), 1)
         assert result["has_next"] is False
         assert result["has_previous"] is True
 
@@ -648,7 +648,7 @@ class TestGetUserConversations(CustomTest):
 
         result = self.controller.get_user_conversations(self.user.telegram_id, page="a", per_page=2)  # type: ignore
         # Check the result
-        self.assertEqual(len(result["conversations"]), 2)
+        self.assertEqual(len(result["data"]), 2)
         assert result["has_next"] is True
         assert result["has_previous"] is False
         assert result["current_page"] == 1
@@ -660,7 +660,7 @@ class TestGetUserConversations(CustomTest):
             self.user.telegram_id, page=10, per_page=2
         )
         # Check the result
-        self.assertEqual(len(result["conversations"]), 1)
+        self.assertEqual(len(result["data"]), 1)
         assert result["has_next"] is False
         assert result["has_previous"] is True
         assert result["current_page"] == 2
@@ -713,8 +713,8 @@ class TestGetConversationMessages(CustomTest):
         )
 
         # Check if the result contains the expected keys
-        self.assertIn("conversations", result)
-        self.assertIn("total_conversations", result)
+        self.assertIn("data", result)
+        self.assertIn("total_data", result)
         self.assertIn("total_pages", result)
         self.assertIn("current_page", result)
         self.assertIn("has_previous", result)
@@ -726,7 +726,7 @@ class TestGetConversationMessages(CustomTest):
         self.assertEqual(result["current_page"], page)
 
         # Check if the number of returned conversations matches the per_page setting
-        self.assertEqual(len(result["conversations"]), per_page)
+        self.assertEqual(len(result["data"]), per_page)
 
         # Test with an invalid page number (less than 1)
         page = 0

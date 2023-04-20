@@ -55,7 +55,7 @@ async def send_paginated_conversations(
     )
 
     response = "**Conversations:**\n"
-    for conversation in result["conversations"]:
+    for conversation in result["data"]:
         response += f"- `{conversation.title}` (ID: {conversation.id})\n"
 
     response += f"\nPage {result['current_page']} of {result['total_pages']}"
