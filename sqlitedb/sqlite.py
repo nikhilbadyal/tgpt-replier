@@ -1,6 +1,7 @@
 """SQLite database to store messages."""
 from typing import Any, Dict, Optional, Tuple, TypeVar, Union
 
+from django.core.exceptions import ValidationError
 from django.core.paginator import EmptyPage, PageNotAnInteger, Paginator
 from django.db.models import Model, QuerySet
 from loguru import logger
@@ -201,14 +202,14 @@ class SQLiteDatabase(object):
             logger.error(f"Unable to save image {e}")
             return ErrorCodes.exceptions
 
-    def delete_all_user_messages(self, telegram_id: int) -> Union[ErrorCodes | int]:
+    def delete_all_user_messages(self, telegram_id: int) -> Union[ErrorCodes, int]:
         """Delete all conversations for a user from the database.
 
         Args:
             telegram_id (int): The ID of the user for which to delete conversations.
 
         Returns:
-        int: The number of conversations deleted, or -1 if an error occurs.
+        int: The number of conversations deleted, or an error code if an error occurs.
         """
         try:
             user = self.get_user(telegram_id)
@@ -219,14 +220,14 @@ class SQLiteDatabase(object):
             logger.error(f"Error deleting {e}")
             return ErrorCodes.exceptions
 
-    def delete_all_user_images(self, telegram_id: int) -> Union[ErrorCodes | int]:
+    def delete_all_user_images(self, telegram_id: int) -> Union[ErrorCodes, int]:
         """Delete all images for a user from the database.
 
         Args:
             telegram_id (int): The ID of the user for which to delete images.
 
         Returns:
-        int: The number of images deleted, or -1 if an error occurs.
+        int: The number of images deleted, or an error code if an error occurs.
         """
         try:
             user = self.get_user(telegram_id)
@@ -272,6 +273,11 @@ class SQLiteDatabase(object):
         conversation = Conversation(user=user, title=title)
         try:
             conversation.save()
+        except ValidationError as ve:
+            logger.error(
+                f"Validation error while saving conversation to the database: {ve}"
+            )
+            return ErrorCodes.exceptions
         except Exception as e:
             logger.error(
                 f"An error occurred while saving conversation to the database: {e}"
@@ -286,6 +292,12 @@ class SQLiteDatabase(object):
                 current_conversation.conversation = conversation
                 current_conversation.save()
             return None
+        except ValidationError as ve:
+            logger.error(
+                f"Validation error while getting or creating current conversation: {ve}"
+            )
+            conversation.delete()
+            return ErrorCodes.exceptions
 
         except Exception as e:
             logger.error(
