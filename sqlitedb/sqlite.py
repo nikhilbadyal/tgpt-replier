@@ -21,6 +21,31 @@ T = TypeVar("T", bound=Model)
 class SQLiteDatabase(object):
     """SQLite database Object."""
 
+    def get_user(self, telegram_id: int) -> Union[User, ErrorCodes]:
+        """Retrieve a User object from the database for a given user_id. If the
+        user does not exist, create a new user.
+
+        Args:
+            telegram_id (int): The ID of the user to retrieve or create.
+
+        Returns:
+            Union[User, int]: The User object corresponding to the specified user ID, or -1 if an error occurs.
+        """
+        try:
+            user: User
+            user, created = User.objects.get_or_create(
+                telegram_id=telegram_id, defaults={"name": f"User {telegram_id}"}
+            )
+        except Exception as e:
+            logger.error(f"Unable to get or create user: {e}")
+            return ErrorCodes.exceptions
+        else:
+            if created:
+                logger.info(f"Created new user with telegram_id {telegram_id}")
+            else:
+                logger.info(f"Retrieved existing user with telegram_id {telegram_id}")
+        return user
+
     def get_messages_by_user(self, telegram_id: int) -> Any:
         """Retrieve a list of messages for a user from the database.
 
@@ -48,29 +73,9 @@ class SQLiteDatabase(object):
             .filter(user=user, conversation=current_conversation.conversation)
             .values("from_bot", "message")
         )
-        messages = messages.order_by("message_date")
+        ordered_messages = messages.order_by("message_date")
 
-        return messages
-
-    def get_user(self, telegram_id: int) -> Union[User, ErrorCodes]:
-        """Retrieve a User object from the database for a given user_id. If the
-        user does not exist, create a new user.
-
-        Args:
-            telegram_id (int): The ID of the user to retrieve or create.
-
-        Returns:
-            Union[User, int]: The User object corresponding to the specified user ID, or -1 if an error occurs.
-        """
-        try:
-            user: User
-            user, created = User.objects.get_or_create(
-                telegram_id=telegram_id, defaults={"name": f"User {telegram_id}"}
-            )
-            return user
-        except Exception as e:
-            logger.error(f"Unable to get or create user: {e}")
-            return ErrorCodes.exceptions
+        return ordered_messages
 
     def _get_current_conversation(
         self, user: User, message: str
