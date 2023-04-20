@@ -2,6 +2,7 @@
 from typing import List, Tuple, Union
 
 from asgiref.sync import sync_to_async
+from loguru import logger
 from telethon import Button, TelegramClient, events
 
 from telegram.commands.strings import conversation_nf
@@ -56,7 +57,7 @@ async def display_paginated_messages(
     page_size = user_settings.get("page_size", PAGE_SIZE)
 
     result = await sync_to_async(db.get_conversation_messages)(
-        telegram_id, page, page_size
+        conversation_id, telegram_id, page, page_size
     )
 
     response = f"Messages from __Conversation {conversation_id}__\n\n"
@@ -99,6 +100,9 @@ async def handle_print_command(event: events.NewMessage.Event) -> None:
     conversation_id = event.pattern_match.group(1)
     if conversation_id:
         conversation_id = int(conversation_id)
+        logger.debug(
+            f"Received request to print messages from conversation {conversation_id}"
+        )
         telegram_id = event.message.sender_id
         page = 1
 

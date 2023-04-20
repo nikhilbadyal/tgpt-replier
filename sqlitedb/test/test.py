@@ -697,3 +697,65 @@ class TestSetActiveConversation(CustomTest):
         assert (
             CurrentConversation.objects.get(user=self.user).conversation == conversation
         )
+
+
+class TestGetConversationMessages(CustomTest):
+    fixtures = [fixture_name]
+
+    def test_get_conversation_messages_pagination(self) -> None:
+        conversation_id = 1
+        per_page = 2
+
+        # Test with valid page number
+        page = 1
+        result = self.controller.get_conversation_messages(
+            conversation_id, self.user.telegram_id, page, per_page
+        )
+
+        # Check if the result contains the expected keys
+        self.assertIn("conversations", result)
+        self.assertIn("total_conversations", result)
+        self.assertIn("total_pages", result)
+        self.assertIn("current_page", result)
+        self.assertIn("has_previous", result)
+        self.assertIn("has_next", result)
+        assert result["has_next"] is True
+        assert result["has_previous"] is False
+
+        # Check if the current_page matches the requested page
+        self.assertEqual(result["current_page"], page)
+
+        # Check if the number of returned conversations matches the per_page setting
+        self.assertEqual(len(result["conversations"]), per_page)
+
+        # Test with an invalid page number (less than 1)
+        page = 0
+        result = self.controller.get_conversation_messages(
+            conversation_id, self.user.telegram_id, page, per_page
+        )
+        self.assertEqual(result["current_page"], 3)  # Should default to the last page
+
+        # Test with an invalid page number (greater than the total number of pages)
+        page = result["total_pages"] + 1
+        result = self.controller.get_conversation_messages(
+            conversation_id, self.user.telegram_id, page, per_page
+        )
+        self.assertEqual(
+            result["current_page"], result["total_pages"]
+        )  # Should default to the last page
+
+        per_page = 2
+
+        # Test with valid page number
+        page = 3
+        result = self.controller.get_conversation_messages(
+            conversation_id, self.user.telegram_id, page, per_page
+        )
+        assert result["has_next"] is False
+        assert result["has_previous"] is True
+
+        # Test with valid page number
+        result = self.controller.get_conversation_messages(
+            conversation_id, self.user.telegram_id, "a", per_page  # type: ignore
+        )
+        self.assertEqual(result["current_page"], 1)  # Should default to the first page

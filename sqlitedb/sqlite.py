@@ -383,11 +383,12 @@ class SQLiteDatabase(object):
         current_conversation.save()
 
     def get_conversation_messages(
-        self, telegram_id: int, page: int, per_page: int
+        self, conversation_id: int, telegram_id: int, page: int, per_page: int
     ) -> Any:
         """Return a paginated list of conversations for a given user.
 
         Args:
+            conversation_id (int): Conversation ID.
             telegram_id (int): The ID of the user.
             page (int): The current page number.
             per_page (int): The number of conversations to display per page.
@@ -400,7 +401,7 @@ class SQLiteDatabase(object):
         # Retrieve the conversations for the given user
         conversations = (
             UserConversations.objects.only("message", "from_bot")
-            .filter(user=user)
+            .filter(user=user, conversation_id=conversation_id)
             .order_by("message_date")
         )
 
@@ -411,11 +412,11 @@ class SQLiteDatabase(object):
         try:
             paginated_conversations = paginator.page(page)
         except PageNotAnInteger:
-            logger.debug("Not a valid page number")
+            logger.debug(f"{page} is not a valid page number")
             # If the page is not an integer, show the first page
             paginated_conversations = paginator.page(1)
         except EmptyPage:
-            logger.debug("Empty current page")
+            logger.debug(f"Empty {page} current page")
             # If the page is out of range, show the last available page
             paginated_conversations = paginator.page(paginator.num_pages)
 
