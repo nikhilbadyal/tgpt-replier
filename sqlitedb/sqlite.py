@@ -204,7 +204,8 @@ class SQLiteDatabase(object):
         int: The number of conversations deleted, or -1 if an error occurs.
         """
         try:
-            conversations = Conversation.objects.filter(user__telegram_id=telegram_id)
+            user = self.get_user(telegram_id)
+            conversations = Conversation.objects.filter(user=user)
             num_deleted = int(conversations.delete()[0])
             return num_deleted
         except Exception as e:
@@ -221,7 +222,8 @@ class SQLiteDatabase(object):
         int: The number of images deleted, or -1 if an error occurs.
         """
         try:
-            images = UserImages.objects.filter(user__telegram_id=telegram_id)
+            user = self.get_user(telegram_id)
+            images = UserImages.objects.filter(user=user)
             num_deleted = int(images.delete()[0])
             return num_deleted
         except Exception as e:
