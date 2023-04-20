@@ -36,7 +36,9 @@ class SQLiteDatabase(object):
         user = self.get_user(telegram_id)
 
         try:
-            current_conversation = CurrentConversation.objects.get(user=user)
+            current_conversation: CurrentConversation = CurrentConversation.objects.get(
+                user=user
+            )
         except CurrentConversation.DoesNotExist:
             logger.error(f"No current conversation found for user with ID {user}.")
             return []
