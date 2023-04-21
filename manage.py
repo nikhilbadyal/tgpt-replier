@@ -1,5 +1,8 @@
 #!/usr/bin/env python
+import os
 from pathlib import Path
+
+import environ
 
 
 def init_django() -> None:
@@ -12,7 +15,9 @@ def init_django() -> None:
     import django
     from django.conf import settings
 
+    env = environ.Env()
     base_dir = Path(__file__).resolve().parent
+    environ.Env.read_env(os.path.join(base_dir, ".env"))
 
     if settings.configured:
         return
@@ -21,12 +26,7 @@ def init_django() -> None:
         INSTALLED_APPS=[
             "sqlitedb",
         ],
-        DATABASES={
-            "default": {
-                "ENGINE": "django.db.backends.sqlite3",
-                "NAME": base_dir / f"{Path(__file__).resolve().parent.name}.db",
-            }
-        },
+        DATABASES={"default": env.db("DATABASE_URL")},
     )
     django.setup()
 
