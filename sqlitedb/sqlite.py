@@ -44,9 +44,9 @@ class SQLiteDatabase(object):
             return ErrorCodes.exceptions
         else:
             if created:
-                logger.info(f"Created new user with telegram_id {telegram_id}")
+                logger.info(f"Created new user {user}")
             else:
-                logger.info(f"Retrieved existing user with telegram_id {telegram_id}")
+                logger.info(f"Retrieved existing {user}")
         return user
 
     def get_messages_by_user(self, telegram_id: int) -> Any:
