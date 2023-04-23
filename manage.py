@@ -21,6 +21,9 @@ def init_django() -> None:
 
     if settings.configured:
         return
+    db = env.db("DATABASE_URL")
+    db["ENGINE"] = "dj_db_conn_pool.backends.postgresql"
+
     settings.configure(
         DEFAULT_AUTO_FIELD="django.db.models.BigAutoField",
         INSTALLED_APPS=[

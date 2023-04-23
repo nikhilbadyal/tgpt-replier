@@ -1,4 +1,5 @@
 django==4.2
+django-db-connection-pool[postgresql]==1.2.2 #https://github.com/altairbow/django-db-connection-pool
 django-environ==0.10.0
 environs==9.5.0
 loguru==0.7.0
