@@ -1,4 +1,4 @@
-exclude: "^venv/|/migrations/"
+exclude: "^venv/|/migrations/|base.py"
 default_stages: [ commit ]
 
 repos:

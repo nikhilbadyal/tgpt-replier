@@ -37,7 +37,7 @@ class SQLiteDatabase(object):
             user, created = User.objects.get_or_create(
                 telegram_id=telegram_id, defaults={"name": f"User {telegram_id}"}
             )
-        except Exception as e:
+        except KeyError as e:
             logger.error(
                 f"Unable to get or create user: {e} because of {type(e).__name__}"
             )

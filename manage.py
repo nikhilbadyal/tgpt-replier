@@ -21,12 +21,15 @@ def init_django() -> None:
 
     if settings.configured:
         return
+    db = env.db("DATABASE_URL")
+    db["ENGINE"] = "sqlitedb"
+
     settings.configure(
         DEFAULT_AUTO_FIELD="django.db.models.BigAutoField",
         INSTALLED_APPS=[
             "sqlitedb",
         ],
-        DATABASES={"default": env.db("DATABASE_URL")},
+        DATABASES={"default": db},
     )
     django.setup()
 
