@@ -10,3 +10,5 @@ report.html
 reports
 /.scannerwork
 *.properties
+userlist.txt
+pgbouncer.ini
