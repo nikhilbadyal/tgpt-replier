@@ -1,4 +1,0 @@
-# FILE: bandit.yaml
-assert_used:
-  skips: ['*test*.py']
-skips: ['B404', 'B603']

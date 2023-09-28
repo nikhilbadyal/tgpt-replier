@@ -1,5 +1,5 @@
 """List User Conversation."""
-from typing import List, Tuple
+from __future__ import annotations
 
 from asgiref.sync import sync_to_async
 from loguru import logger
@@ -15,14 +15,14 @@ def add_list_handlers(client: TelegramClient) -> None:
 
 
 @events.register(events.CallbackQuery(pattern=r"(next|prev)_page:(\d+)"))  # type: ignore
-async def navigate_pages(event: events.callbackquery.CallbackQuery.Event):
+async def navigate_pages(event: events.callbackquery.CallbackQuery.Event) -> None:
     """Event handler to navigate between pages of conversations.
 
     Args:
         event (CallbackQuery.Event): The callback query event.
     """
     telegram_id = event.query.user_id
-    action, page = event.data.decode("utf-8").split(":")
+    _, page = event.data.decode("utf-8").split(":")
     page = int(page)
 
     await event.answer()
@@ -31,15 +31,17 @@ async def navigate_pages(event: events.callbackquery.CallbackQuery.Event):
 
 
 async def send_paginated_conversations(
-    telegram_id: int, page: int
-) -> Tuple[str, List[Button] | None]:
+    telegram_id: int,
+    page: int,
+) -> tuple[str, list[Button] | None]:
     """Fetch and send paginated conversations for the given user.
 
     Args:
         telegram_id (int): The Telegram ID of the user.
         page (int): The current page number.
 
-    Returns:
+    Returns
+    -------
         Tuple[str, List]: A tuple containing the response message and the list of buttons.
     """
     from main import db
@@ -51,7 +53,9 @@ async def send_paginated_conversations(
     page_size = user_settings.get("page_size", PAGE_SIZE)
 
     result = await sync_to_async(db.get_user_conversations)(
-        telegram_id, page, page_size
+        telegram_id,
+        page,
+        page_size,
     )
 
     response = "**Conversations:**\n"
@@ -60,7 +64,7 @@ async def send_paginated_conversations(
 
     response += f"\nPage {result['current_page']} of {result['total_pages']}"
 
-    buttons: List[Button] = []
+    buttons: list[Button] = []
     if result["has_previous"]:
         buttons.append(Button.inline("Previous", data=f"prev_page:{page - 1}"))
     if result["has_next"]:

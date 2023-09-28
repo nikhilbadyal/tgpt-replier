@@ -1,35 +1,35 @@
 """Generate PgBouncer configuration file."""
+from __future__ import annotations
+
 import hashlib
-import os
 import re
 from pathlib import Path
-from typing import List, Tuple
 
 # noinspection PyPackageRequirements
 import environ
 
 
 def load_ini_with_env(file_path: str) -> str:
-    """Load the INI file and replace placeholders with the corresponding
-    environment variable values.
+    """Load the INI file and replace placeholders with the corresponding environment variable values.
 
     :param file_path: Path to the .ini file containing placeholders.
-    :return: Content of the .ini file with placeholders replaced by
-             environment variable values.
+    :return: Content of the .ini file with placeholders replaced by environment variable values.
     """
-    with open(file_path, "r") as file:
+    with Path(file_path).open() as file:
         content = file.read()
 
     updated_content: str = re.sub(
-        r"%env\((.*?)\)%", lambda match: environ.Env().str(match.group(1)), content  # type: ignore
+        r"%env\((.*?)\)%",
+        lambda match: environ.Env().str(match.group(1)),
+        content,
     )
 
     return updated_content
 
 
-def load_env_for_userlist() -> List[Tuple[str, str]]:
-    """Load the PGBOUNCER_USER environment variable and return a list
-    containing a single tuple of the username and password.
+def load_env_for_userlist() -> list[tuple[str, str]]:
+    """Load the PGBOUNCER_USER environment variable and return a list containing a single tuple of the username and
+    password.
 
     :return: A list containing a single tuple with the username and password.
     """
@@ -37,8 +37,7 @@ def load_env_for_userlist() -> List[Tuple[str, str]]:
     user, password = pgbouncer_user.split(":")
 
     # Generate the userlist.txt file
-    user_password_pairs = [(user, password)]
-    return user_password_pairs
+    return [(user, password)]
 
 
 def write_to_file(content: str, output_file_path: str) -> None:
@@ -47,13 +46,12 @@ def write_to_file(content: str, output_file_path: str) -> None:
     :param content: Processed content with placeholders replaced by environment variable values.
     :param output_file_path: Path to the output .ini file.
     """
-    with open(output_file_path, "w") as file:
+    with Path(output_file_path).open("w") as file:
         file.write(content)
 
 
 def md5_hash_password(user: str, password: str) -> str:
-    """Create an MD5 hash of the  username and password in the and then
-    concatenated as required by PgBouncer.
+    """Create an MD5 hash of the  username and password in the and then concatenated as required by PgBouncer.
 
     :param user: The database user's username.
     :param password: The database user's plain-text password.
@@ -63,7 +61,7 @@ def md5_hash_password(user: str, password: str) -> str:
     return f"md5{md5hash}"
 
 
-def generate_userlist_file(user_password_pairs: List[Tuple[str, str]]) -> str:
+def generate_userlist_file(user_password_pairs: list[tuple[str, str]]) -> str:
     """Generate a userlist.txt file for PgBouncer with MD5 hashed passwords.
 
     :param user_password_pairs: A list of tuples containing username and password pairs.
@@ -77,11 +75,11 @@ def generate_userlist_file(user_password_pairs: List[Tuple[str, str]]) -> str:
 
 
 def main() -> None:
-    """Generate PgBouncer configuration files (pgbouncer.ini and userlist.txt)
-    based on environment variables and a sample INI file."""
+    """Generate PgBouncer configuration files (pgbouncer.ini and userlist.txt) based on environment variables and a
+    sample INI file."""
     # Read environment variables from the .env file."""
     base_dir = Path(__file__).resolve().parent.parent
-    environ.Env.read_env(os.path.join(base_dir, ".env"))
+    environ.Env.read_env(Path(base_dir, ".env"))
 
     # Load and process the .ini file
     ini_content = load_ini_with_env("pgbouncer_sample.ini")

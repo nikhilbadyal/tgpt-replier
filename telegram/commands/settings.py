@@ -18,7 +18,7 @@ def add_settings_handlers(client: TelegramClient) -> None:
 @events.register(events.CallbackQuery(pattern="list_settings"))  # type: ignore
 async def handle_settings_list_settings(
     event: events.callbackquery.CallbackQuery.Event,
-):
+) -> None:
     """Event handler for listing available settings.
 
     Args:
@@ -36,7 +36,7 @@ async def handle_settings_list_settings(
 @events.register(events.CallbackQuery(pattern="current_settings"))  # type: ignore
 async def handle_settings_current_settings(
     event: events.callbackquery.CallbackQuery.Event,
-):
+) -> None:
     """Event handler for listing current settings.
 
     Args:
@@ -71,9 +71,7 @@ async def handle_settings_command(event: events.NewMessage.Event) -> None:
     if len(parts) < 3:
         response = "To update a setting, use the following command format:\n``/settings <setting_name> <value>`\n\n"
         response += "**For example**:\n`/settings page_size 5`\n\n"
-        response += (
-            "Click the **List Settings** button below to see available settings."
-        )
+        response += "Click the **List Settings** button below to see available settings."
 
         buttons = [
             Button.inline("List Settings", data="list_settings"),
@@ -96,7 +94,7 @@ async def handle_settings_command(event: events.NewMessage.Event) -> None:
     }
 
     setting_modification_function = settings_modification_functions.get(
-        setting_name.lower()
+        setting_name.lower(),
     )
     if setting_modification_function:
         await setting_modification_function(event, user, user_settings, new_value)

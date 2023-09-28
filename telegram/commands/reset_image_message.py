@@ -2,17 +2,20 @@
 # Import necessary libraries and modules
 import re
 from re import Match
+from typing import TYPE_CHECKING
 
 from asgiref.sync import sync_to_async
 from loguru import logger
 from telethon import Button, TelegramClient, events
-from telethon.tl.custom import Message
-from telethon.tl.types import User
 
 # Import some helper functions
 from sqlitedb.utils import ErrorCodes
 from telegram.commands.strings import cleanup_success, ignore, something_bad_occurred
 from telegram.commands.utils import SupportedCommands, get_user
+
+if TYPE_CHECKING:
+    from telethon.tl.custom import Message
+    from telethon.tl.types import User
 
 # Define constants for the /resetimages and /resetmessage commands
 reset_yes_data = b"reset_im_yes"
@@ -31,7 +34,8 @@ def add_reset_image_message_handlers(client: TelegramClient) -> None:
     Args:
         client (TelegramClient): The Telegram client object.
 
-    Returns:
+    Returns
+    -------
         None: This function doesn't return anything.
     """
     client.add_event_handler(handle_reset_messages_images_command)
@@ -41,7 +45,7 @@ def add_reset_image_message_handlers(client: TelegramClient) -> None:
 @events.register(events.callbackquery.CallbackQuery(pattern="^reset_im_(yes|no)$"))  # type: ignore
 async def handle_reset_image_message_confirm_response(
     event: events.callbackquery.CallbackQuery.Event,
-):
+) -> None:
     """Handle reset confirmation response for image/message deletion.
 
     This function is registered as an event handler to handle user responses to the confirmation message
@@ -52,7 +56,8 @@ async def handle_reset_image_message_confirm_response(
     Args:
         event (events.callbackquery.CallbackQuery.Event): The event object associated with the user's response.
 
-    Returns:
+    Returns
+    -------
         None: This function doesn't return anything.
     """
     await event.answer()
@@ -72,7 +77,8 @@ async def handle_reset_image_message_confirm_response(
 
             # Call the function to clean up user data
             result = await sync_to_async(gpt.clean_up_user_data)(
-                reply_message, telegram_user
+                reply_message,
+                telegram_user,
             )
 
             # Log the number of items deleted
@@ -105,7 +111,8 @@ async def handle_reset_messages_images_command(event: events.NewMessage.Event) -
     Args:
         event (events.NewMessage.Event): The event object associated with the /resetmessages or /resetimages command.
 
-    Returns:
+    Returns
+    -------
         None: This function doesn't return anything.
     """
     # Get the original message text and extract the request type

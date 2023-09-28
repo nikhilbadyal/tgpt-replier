@@ -27,14 +27,14 @@ def generate_random_string(length: int = 10) -> str:
     Args:
         length (int): Length of the desired random string.
 
-    Returns:
+    Returns
+    -------
         str: Random string of lowercase letters with the given length.
     """
     # Create a string of all lowercase letters
     letters = string.ascii_lowercase
 
     # Use a loop to randomly select characters from the string to build the result string
-    result_str = "".join(secrets.choice(letters) for _ in range(length))
+    return "".join(secrets.choice(letters) for _ in range(length))
 
     # Return the result string
-    return result_str

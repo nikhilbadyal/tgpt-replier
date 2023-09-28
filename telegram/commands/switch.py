@@ -46,7 +46,9 @@ async def handle_switch_command(event: events.NewMessage.Event) -> None:
 
 # Handle the switch conversation callback
 async def switch_conversation(
-    event: events.NewMessage.Event, user: User, conversation_id: int
+    event: events.NewMessage.Event,
+    user: User,
+    conversation_id: int,
 ) -> None:
     """Switch the user's active conversation to the specified conversation.
 
@@ -69,5 +71,5 @@ async def switch_conversation(
     # to set the active conversation for the user
     await sync_to_async(db.set_active_conversation)(user, conversation)
     await event.reply(
-        f"Switched to conversation {conversation.title} (ID: {conversation.id})"
+        f"Switched to conversation {conversation.title} (ID: {conversation.id})",
     )

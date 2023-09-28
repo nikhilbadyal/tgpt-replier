@@ -1,15 +1,19 @@
 """Handle new command."""
 
 # Import necessary libraries and modules
+from typing import TYPE_CHECKING
+
 from asgiref.sync import sync_to_async
 from loguru import logger
 from telethon import events
-from telethon.tl.types import User
 
 # Import some helper functions
 from sqlitedb.utils import ErrorCodes
 from telegram.commands.strings import something_bad_occurred
 from telegram.commands.utils import SupportedCommands, get_user
+
+if TYPE_CHECKING:
+    from telethon.tl.types import User
 
 
 # Register the function to handle the /new command
@@ -20,7 +24,8 @@ async def handle_new_command(event: events.NewMessage.Event) -> None:
     Args:
         event (events.NewMessage.Event): A new message event.
 
-    Returns:
+    Returns
+    -------
         None: This function doesn't return anything.
     """
     # Import the main function for initiating a new conversation

@@ -15,7 +15,10 @@ from telegram.commands.utils import SupportedCommands, get_user
 
 # Define a function to download an image from a URL and send it to the user
 async def send_image_from_url(
-    event: events.NewMessage.Event, user: User, url: str, caption: str
+    event: events.NewMessage.Event,
+    user: User,
+    url: str,
+    caption: str,
 ) -> None:
     """Downloads an image from a URL and sends it to the user in Telegram.
 
@@ -25,10 +28,10 @@ async def send_image_from_url(
         url (str): The URL of the image to download.
         caption (str): The caption for the image.
 
-    Returns:
+    Returns
+    -------
         None: This function doesn't return anything.
     """
-
     response = requests.get(url, timeout=20)
     file_bytes = response.content
     await event.send_file(entity=user, file=file_bytes, caption=caption)
@@ -42,7 +45,8 @@ async def handle_image_command(event: events.NewMessage.Event) -> None:
     Args:
         event (events.NewMessage.Event): A new message event.
 
-    Returns:
+    Returns
+    -------
         None: This function doesn't return anything.
     """
     # Import the main function for generating image URLs

@@ -6,7 +6,7 @@ venv
 *.session*
 *.db
 report.html
-.coverage
+.coverage**
 reports
 /.scannerwork
 *.properties

@@ -23,7 +23,8 @@ async def handle_start_message(event: events.NewMessage.Event) -> None:
     Args:
         event (events.NewMessage.Event): A new message event.
 
-    Returns:
+    Returns
+    -------
         None: This function doesn't return anything.
     """
     # Define a prefix for the pun

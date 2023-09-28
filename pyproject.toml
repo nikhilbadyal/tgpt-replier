@@ -1,0 +1,78 @@
+[tool.ruff]
+line-length = 120
+select = ["ALL"]
+ignore = [
+    "ANN401", #Disallow Any
+    "D401", #Imperative mood
+    "RUF012", #ignore till https://github.com/astral-sh/ruff/issues/5243
+    "UP004", #useless-object-inheritance
+    "PGH003", #useless-object-inheritance
+    "D205", #blank line required between summary line and description
+    "FBT003", # Boolean positional value in function call
+    "FBT001", # Boolean positional value in function call
+    "BLE001", # Do not catch blind exception: `Exception`
+
+]
+target-version = "py38"
+fix = true
+show-fixes = true
+[tool.ruff.pydocstyle]
+convention = "numpy"
+
+[tool.ruff.per-file-ignores]
+"test**.py" = ["S101","SLF001","PT019","S311","D102"]
+"model**.py" = ["A003"]
+
+
+[tool.docformatter]
+recursive = true
+wrap-summaries = 120
+wrap-descriptions = 120
+
+[tool.black]
+line-length = 120
+
+[pycodestyle]
+max-line-length = 120
+exclude = ["venv"]
+
+
+[tool.mypy]
+ignore_missing_imports = true
+check_untyped_defs = true
+warn_unused_ignores = true
+warn_redundant_casts = true
+warn_unused_configs = true
+plugins = ["mypy_django_plugin.main"]
+
+[tool.django-stubs]
+django_settings_module = "manage"
+
+[tools.pytest]
+pythonpath = ["esxport"]
+
+[tool.pytest.ini_options]
+addopts = "--cov=. --cov-report=xml --cov-report term-missing --ff -x --no-cov-on-fail --emoji --dist loadgroup --tx=4*popen"
+
+[tool.coverage.run]
+#branch = true #https://github.com/nedbat/coveragepy/issues/605
+parallel = true
+
+[tool.coverage.report]
+skip_covered = true
+skip_empty = true
+show_missing=true
+sort="-Stmts"
+omit = ["test/**"]
+exclude_lines = [
+    'if TYPE_CHECKING:',
+    'if __name__ == "__main__":'
+    ]
+
+
+
+[tool.pyright]
+include = ["."]
+typeCheckingMode = "strict"
+exclude = ["**/test",]
+reportMissingTypeStubs = false

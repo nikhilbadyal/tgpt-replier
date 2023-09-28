@@ -8,7 +8,7 @@ from sqlitedb.models import Conversation, User
 from sqlitedb.utils import test_conversation
 
 
-@pytest.mark.django_db
+@pytest.mark.django_db()
 def test_conversation_creation(user: User) -> None:
     """Test creating a conversation for a user."""
     # Create a conversation
@@ -27,7 +27,7 @@ def test_conversation_creation(user: User) -> None:
     conversation.delete()
 
 
-@pytest.mark.django_db
+@pytest.mark.django_db()
 def test_conversation_str(user: User) -> None:
     """Test the string representation of a conversation."""
     conversation = Conversation.objects.create(user=user, title=test_conversation)
@@ -37,14 +37,14 @@ def test_conversation_str(user: User) -> None:
     )
 
 
-@pytest.mark.django_db
+@pytest.mark.django_db()
 def test_conversation_title_optional(user: User) -> None:
     """Test that a conversation can be created without a title."""
     conversation = Conversation.objects.create(user=user)
     assert conversation.title is None
 
 
-@pytest.mark.django_db
+@pytest.mark.django_db()
 def test_conversation_start_time_immutable(user: User) -> None:
     """Test that the start time of a conversation is immutable."""
     conversation = Conversation.objects.create(user=user)
@@ -54,16 +54,15 @@ def test_conversation_start_time_immutable(user: User) -> None:
     assert conversation.start_time == start_time
 
 
-@pytest.mark.django_db
+@pytest.mark.django_db()
 def test_conversation_start_time_auto_generated(user: User) -> None:
-    """Test that the start time of a conversation is auto-generated if not
-    provided."""
+    """Test that the start time of a conversation is auto-generated if not provided."""
     conversation1 = Conversation.objects.create(user=user)
     conversation2 = Conversation.objects.create(user=user)
     assert conversation1.start_time < conversation2.start_time
 
 
-@pytest.mark.django_db
+@pytest.mark.django_db()
 def test_conversation_update(conversation: Conversation) -> None:
     """Test updating the title of a conversation."""
     conversation.title = "New Title"
@@ -71,7 +70,7 @@ def test_conversation_update(conversation: Conversation) -> None:
     assert conversation.title == "New Title"
 
 
-@pytest.mark.django_db
+@pytest.mark.django_db()
 def test_conversation_start_time_default(conversation: Conversation) -> None:
     """Test that the start time is auto-generated if not provided."""
     conversation = Conversation.objects.create(

@@ -1,10 +1,15 @@
 """Utility functions."""
+from __future__ import annotations
+
 from enum import Enum
-from typing import Any, List, Optional
+from typing import TYPE_CHECKING, Any
 
 from loguru import logger
-from telethon import events
-from telethon.tl.types import User
+
+if TYPE_CHECKING:
+    from telethon import events
+    from telethon.tl.types import User
+    from typing_extensions import Self
 
 PAGE_SIZE = 10  # Number of conversations per page
 
@@ -26,21 +31,23 @@ class SupportedCommands(Enum):
     PRINT: str = "/print"
 
     @classmethod
-    def get_values(cls) -> List[str]:
+    def get_values(cls) -> list[str]:
         """Returns a list of all the values of the SupportedCommands enum.
 
-        Returns:
+        Returns
+        -------
             list: A list of all the values of the SupportedCommands enum.
         """
         return [command.value for command in cls]
 
-    def __str__(self) -> str:
+    def __str__(self: Self) -> str:
         """Returns the string representation of the enum value.
 
-        Returns:
+        Returns
+        -------
             str: The string representation of the enum value.
         """
-        return self.value
+        return str(self.value)
 
 
 async def get_user(event: events.NewMessage.Event) -> User:
@@ -49,7 +56,8 @@ async def get_user(event: events.NewMessage.Event) -> User:
     Args:
         event (events.NewMessage.Event): The message event.
 
-    Returns:
+    Returns
+    -------
         User: The User entity associated with the message event.
     """
     try:
@@ -62,15 +70,14 @@ async def get_user(event: events.NewMessage.Event) -> User:
 
 
 def get_regex() -> str:
-    """Generate a regex pattern that matches any message that is not a
-    supported command.
+    """Generate a regex pattern that matches any message that is not a supported command.
 
-    Returns:
+    Returns
+    -------
         str: A regex pattern as a string.
     """
     # Exclude any message that starts with one of the supported commands using negative lookahead
-    pattern = r"^(?!(%s))[^/].*" % "|".join(SupportedCommands.get_values())
-    return pattern
+    return r"^(?!(%s))[^/].*" % "|".join(SupportedCommands.get_values())
 
 
 class UserSettings(Enum):
@@ -78,23 +85,25 @@ class UserSettings(Enum):
 
     PAGE_SIZE = "page_size", "The number of conversations displayed per page."
 
-    def __new__(cls, *args: Any, **kwds: Any) -> "UserSettings":
+    def __new__(cls, *args: Any, **kwds: Any) -> UserSettings:
         obj = object.__new__(cls)
         obj._value_ = args[0]
         return obj
 
     # ignore the first param since it's already set by __new__
-    def __init__(self, _: str, description: Optional[str] = None):
+    def __init__(self: Self, _: str, description: str | None = None) -> None:
         self._description_ = description
 
-    def __str__(self) -> str:
+    def __str__(self: Self) -> str:
+        """String representation."""
         return str(self.value)
 
     @property
-    def description(self) -> Optional[str]:
+    def description(self: Self) -> str | None:
         """Returns the description of the setting.
 
-        Returns:
+        Returns
+        -------
             Optional[str]: The description of the setting.
         """
         return self._description_

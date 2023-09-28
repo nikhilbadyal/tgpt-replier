@@ -1,5 +1,6 @@
 """Models."""
 from django.db import models
+from typing_extensions import Self
 
 from manage import init_django
 from sqlitedb.utils import UserStatus
@@ -10,13 +11,12 @@ init_django()
 class UserManager(models.Manager):  # type: ignore
     """Manager for the User model."""
 
-    pass
-
 
 class User(models.Model):
     """Model for storing user data.
 
-    Attributes:
+    Attributes
+    ----------
         id (int): The unique ID of the user.
         name (str or None): The name of the user, or None if no name was provided.
         telegram_id (int): The ID of the user.
@@ -30,7 +30,8 @@ class User(models.Model):
     Meta:
         db_table (str): The name of the database table used to store this model's data.
 
-    Raises:
+    Raises
+    ------
         IntegrityError: If the user's Telegram ID is not unique.
     """
 
@@ -38,7 +39,7 @@ class User(models.Model):
     id = models.AutoField(primary_key=True)
 
     # User name, max length of 255, can be null
-    name = models.CharField(max_length=255, null=True)
+    name = models.CharField(max_length=255)
 
     # User Telegram ID, integer
     telegram_id = models.IntegerField(unique=True)
@@ -63,18 +64,24 @@ class User(models.Model):
     objects = UserManager()
 
     class Meta:
-        # Database table name
+        """Database table name."""
+
         db_table = "user"
 
-    def __str__(self) -> str:
+    def __str__(self: Self) -> str:
         """Return a string representation of the user object."""
         return f"User(id={self.id}, name={self.name}, telegram_id={self.telegram_id}, status={self.status})"
+
+
+class ConversationManager(models.Manager):
+    """Manager for the Conversation model."""
 
 
 class Conversation(models.Model):
     """Model for storing conversation data.
 
-    Attributes:
+    Attributes
+    ----------
         id (int): The unique ID of the conversation.
         user (ForeignKey): The user associated with the conversation.
         title (str or None): The title of the conversation, or None if no title was provided.
@@ -91,24 +98,32 @@ class Conversation(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
 
     # Conversation title, max length of 255, can be null
-    title = models.CharField(max_length=255, null=True)
+    title = models.CharField(max_length=255)
 
     # Start time of the conversation
     start_time = models.DateTimeField(auto_now_add=True, editable=False)
 
+    objects = ConversationManager()
+
     class Meta:
-        # Database table name
+        """Database table name."""
+
         db_table = "conversation"
 
-    def __str__(self) -> str:
+    def __str__(self: Self) -> str:
         """Return a string representation of the conversation object."""
         return f"Conversation(id={self.id}, user={self.user}, title={self.title}, start_time={self.start_time})"
+
+
+class UserConversationsManager(models.Manager):  # type: ignore
+    """Manager for the UserConversations model."""
 
 
 class UserConversations(models.Model):
     """Model for storing user messages in a conversation.
 
-    Attributes:
+    Attributes
+    ----------
         id (int): The unique ID of the message.
         user (ForeignKey): The user associated with the message.
         message (str): The text of the message.
@@ -138,11 +153,14 @@ class UserConversations(models.Model):
     # Date and time message was sent, auto-generated on creation
     message_date = models.DateTimeField(auto_now_add=True)
 
+    objects = UserConversationsManager()
+
     class Meta:
-        # Database table name
+        """Database table name."""
+
         db_table = "user_conversations"
 
-    def __str__(self) -> str:
+    def __str__(self: Self) -> str:
         """Return a string representation of the user conversation object."""
         return f"""
         UserConversations(id={self.id}, user={self.user}, message={self.message}, from_bot={self.from_bot},
@@ -153,13 +171,12 @@ class UserConversations(models.Model):
 class CurrentConversationManager(models.Manager):  # type: ignore
     """Manager for the CurrentConversation model."""
 
-    pass
-
 
 class CurrentConversation(models.Model):
     """Model for storing the current conversation of a user.
 
-    Attributes:
+    Attributes
+    ----------
         user (ForeignKey): The user associated with the current conversation.
         conversation (ForeignKey): The conversation the user is currently in.
 
@@ -180,27 +197,24 @@ class CurrentConversation(models.Model):
     objects = CurrentConversationManager()
 
     class Meta:
-        # Database table name
+        """Database table name."""
+
         db_table = "current_conversation"
 
-    def __str__(self) -> str:
-        """Return a string representation of the current conversation
-        object."""
-        return (
-            f"CurrentConversation(user={self.user}, conversation={self.conversation})"
-        )
+    def __str__(self: Self) -> str:
+        """Return a string representation of the current conversation object."""
+        return f"CurrentConversation(user={self.user}, conversation={self.conversation})"
 
 
 class ImagesManager(models.Manager):  # type: ignore
     """Manager for the UserImages model."""
 
-    pass
-
 
 class UserImages(models.Model):
     """Model for storing user images.
 
-    Attributes:
+    Attributes
+    ----------
         id (int): The unique ID of the image.
         user (ForeignKey): The user who sent the image.
         image_caption (str or None): The caption for the image, or None if no caption was provided.
@@ -222,7 +236,7 @@ class UserImages(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
 
     # Caption for the image, can be null
-    image_caption = models.TextField(null=True)
+    image_caption = models.TextField()
 
     # URL where the image is stored
     image_url = models.TextField()
@@ -237,10 +251,11 @@ class UserImages(models.Model):
     objects = ImagesManager()
 
     class Meta:
-        # Database table name
+        """Database table name."""
+
         db_table = "user_images"
 
-    def __str__(self) -> str:
+    def __str__(self: Self) -> str:
         """Return a string representation of the user image object."""
         return f"""UserImages(id={self.id}, user={self.user}, image_caption={self.image_caption},
         image_url={self.image_url}, from_bot={self.from_bot}, message_date={self.message_date})"""

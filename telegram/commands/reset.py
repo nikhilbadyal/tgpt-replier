@@ -1,14 +1,18 @@
 """Handle Reset Command."""
 # Import necessary libraries and modules
+from typing import TYPE_CHECKING
+
 from asgiref.sync import sync_to_async
 from loguru import logger
 from telethon import Button, TelegramClient, events
-from telethon.tl.types import User
 
 # Import some helper functions
 from sqlitedb.utils import ErrorCodes
 from telegram.commands.strings import cleanup_success, ignore, something_bad_occurred
 from telegram.commands.utils import SupportedCommands, get_user
+
+if TYPE_CHECKING:
+    from telethon.tl.types import User
 
 reset_yes_data = b"reset_yes"
 reset_yes_description = "Yes!"
@@ -25,7 +29,7 @@ def add_reset_handlers(client: TelegramClient) -> None:
 @events.register(events.callbackquery.CallbackQuery(pattern="^reset_(yes|no)$"))  # type: ignore
 async def handle_reset_confirm_response(
     event: events.callbackquery.CallbackQuery.Event,
-):
+) -> None:
     """Handle reset confirmation response.
 
     This function is registered as an event handler to handle the callback query
@@ -37,7 +41,8 @@ async def handle_reset_confirm_response(
     Args:
         event (events.callbackquery.CallbackQuery.Event): The event object associated with the callback query.
 
-    Returns:
+    Returns
+    -------
         None: This function doesn't return anything.
     """
     await event.answer()
@@ -50,7 +55,8 @@ async def handle_reset_confirm_response(
         telegram_user: User = await get_user(event)
         # Call the function to clean up user data
         num_conv_deleted, num_img_deleted = await sync_to_async(gpt.clean_up_user_data)(
-            SupportedCommands.RESET.value, telegram_user
+            SupportedCommands.RESET.value,
+            telegram_user,
         )
 
         # Log the number of items deleted
@@ -58,7 +64,8 @@ async def handle_reset_confirm_response(
 
         # Send a success message if items were deleted, otherwise send an error message
         if not isinstance(num_conv_deleted, ErrorCodes) and not isinstance(
-            num_img_deleted, ErrorCodes
+            num_img_deleted,
+            ErrorCodes,
         ):
             await event.edit(cleanup_success)
         else:
@@ -75,10 +82,10 @@ async def handle_reset_command(event: events.NewMessage.Event) -> None:
     Args:
         event (events.NewMessage.Event): A new message event.
 
-    Returns:
+    Returns
+    -------
         None: This function doesn't return anything.
     """
-
     # Log that a request has been received to delete all user data
     logger.debug("Received request to delete all user data")
 
