@@ -1,4 +1,5 @@
 """Handle start command."""
+
 # Import necessary libraries and modules
 from loguru import logger
 from telethon import TelegramClient, events

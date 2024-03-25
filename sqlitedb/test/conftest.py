@@ -1,4 +1,5 @@
 """Fixtures."""
+
 from datetime import timedelta
 from typing import Generator, no_type_check_decorator
 

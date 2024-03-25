@@ -1,4 +1,5 @@
 """Models."""
+
 from django.db import models
 from typing_extensions import Self
 

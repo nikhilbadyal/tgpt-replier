@@ -1,4 +1,5 @@
 """SQLite database to store messages."""
+
 from __future__ import annotations
 
 from typing import TYPE_CHECKING, Any, TypeVar
