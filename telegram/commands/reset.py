@@ -1,4 +1,5 @@
 """Handle Reset Command."""
+
 # Import necessary libraries and modules
 from typing import TYPE_CHECKING
 

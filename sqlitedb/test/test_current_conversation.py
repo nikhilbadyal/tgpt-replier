@@ -1,4 +1,5 @@
 """Test Current Conversation."""
+
 from django.test import TestCase
 from typing_extensions import Self
 

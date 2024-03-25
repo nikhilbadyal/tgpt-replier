@@ -1,4 +1,5 @@
 """Utility class."""
+
 from enum import Enum
 
 test_message = "Test message"
