@@ -1,4 +1,5 @@
 """Auth Open API."""
+
 from __future__ import annotations
 
 from typing import TYPE_CHECKING
@@ -171,9 +172,9 @@ class ChatGPT(object):
 
         if data == DataType.MESSAGES.value:
             return self._clean_up_user_messages(telegram_user)
-        elif data == DataType.IMAGES.value:
+        if data == DataType.IMAGES.value:
             return self._clean_up_user_images(telegram_user)
-        elif data == DataType.ALL.value:
+        if data == DataType.ALL.value:
             return db.delete_all_user_data(telegram_user.id)
         logger.error(f"Not a valid choice {data}")
         return ErrorCodes.exceptions

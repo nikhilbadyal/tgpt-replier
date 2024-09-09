@@ -1,4 +1,5 @@
 """Restart on code changes."""
+
 from __future__ import annotations
 
 import os

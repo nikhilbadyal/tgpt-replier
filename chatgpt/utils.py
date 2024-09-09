@@ -1,4 +1,5 @@
 """Utility class."""
+
 import secrets
 import string
 from enum import Enum

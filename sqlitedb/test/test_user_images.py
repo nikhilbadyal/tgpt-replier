@@ -1,4 +1,5 @@
 """User Image test."""
+
 import datetime
 
 from django.test import TestCase

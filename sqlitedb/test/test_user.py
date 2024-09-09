@@ -10,7 +10,7 @@ from sqlitedb.sqlite import SQLiteDatabase
 from sqlitedb.utils import UserStatus
 
 
-@pytest.fixture()
+@pytest.fixture
 def user() -> User:
     """A fixture that generates a sample user object with pre-defined values."""
     user = {
@@ -21,7 +21,7 @@ def user() -> User:
     return User.objects.create(**user)  # type: ignore
 
 
-@pytest.mark.django_db()
+@pytest.mark.django_db
 def test_create_user(user: User) -> None:
     """Test creating a new user and saving it to the database.
 
@@ -40,7 +40,7 @@ def test_create_user(user: User) -> None:
     assert isinstance(user.last_updated, datetime)
 
 
-@pytest.mark.django_db()
+@pytest.mark.django_db
 def test_unique_telegram_id() -> None:
     """Test that creating a user with a non-unique Telegram ID raises an IntegrityError.
 
@@ -59,7 +59,7 @@ def test_unique_telegram_id() -> None:
         )
 
 
-@pytest.mark.django_db()
+@pytest.mark.django_db
 def test_update_user(user: User) -> None:
     """Test updating a user's details and saving the changes to the database.
 
@@ -81,7 +81,7 @@ def test_update_user(user: User) -> None:
     assert updated_user.last_updated > user.joining_date
 
 
-@pytest.mark.django_db()
+@pytest.mark.django_db
 def test_delete_user(user: User) -> None:
     """Test deleting a user from the database.
 
@@ -99,7 +99,7 @@ def test_delete_user(user: User) -> None:
         User.objects.get(id=user_id)
 
 
-@pytest.mark.django_db()
+@pytest.mark.django_db
 def test_string_representation(user: User) -> None:
     """Test the string representation of a user object.
 
@@ -113,7 +113,7 @@ def test_string_representation(user: User) -> None:
     assert str(user) == f"User(id={user.id}, name={user.name}, telegram_id={user.telegram_id}, status={user.status})"
 
 
-@pytest.mark.django_db()
+@pytest.mark.django_db
 def test_get_active_users(user: User) -> None:
     """Test getting all active users from the database.
 
@@ -129,7 +129,7 @@ def test_get_active_users(user: User) -> None:
     assert active_users[0].id == user.id
 
 
-@pytest.mark.django_db()
+@pytest.mark.django_db
 def test_get_suspended_users() -> None:
     """Test getting all suspended users from the database.
 
@@ -144,7 +144,7 @@ def test_get_suspended_users() -> None:
     assert len(suspended_users) == 0
 
 
-@pytest.mark.django_db()
+@pytest.mark.django_db
 def test_get_temporarily_banned_users() -> None:
     """Test getting all temporarily banned users from the database.
 
@@ -159,7 +159,7 @@ def test_get_temporarily_banned_users() -> None:
     assert len(temporarily_banned_users) == 0
 
 
-@pytest.mark.django_db()
+@pytest.mark.django_db
 def test_last_updated_auto_now(user: User) -> None:
     """Test that the 'last_updated' field is automatically updated when a user object is modified and saved.
 
@@ -177,7 +177,7 @@ def test_last_updated_auto_now(user: User) -> None:
     assert updated_user.last_updated > original_last_updated
 
 
-@pytest.mark.django_db()
+@pytest.mark.django_db
 def test_joining_date_auto_now_add(user: User) -> None:
     """Test that the 'joining_date' field is automatically set when a new user object is created and saved.
 
@@ -192,7 +192,7 @@ def test_joining_date_auto_now_add(user: User) -> None:
     assert (now - timedelta(seconds=1)) <= user.joining_date <= (now + timedelta(seconds=1))
 
 
-@pytest.mark.django_db()
+@pytest.mark.django_db
 def test_get_messages_by_user_valid_user_and_messages(user_with_messages: User) -> None:
     """Test get_messages_by_user_valid_user."""
     bot = SQLiteDatabase()
@@ -201,7 +201,7 @@ def test_get_messages_by_user_valid_user_and_messages(user_with_messages: User) 
     assert all(isinstance(msg, dict) and len(msg) == 2 and "from_bot" in msg and "message" in msg for msg in messages)
 
 
-@pytest.mark.django_db()
+@pytest.mark.django_db
 def test_get_messages_by_user_valid_user_no_messages(user_without_messages: User) -> None:
     """Tets no messages for user."""
     bot = SQLiteDatabase()
@@ -209,7 +209,7 @@ def test_get_messages_by_user_valid_user_no_messages(user_without_messages: User
     assert len(messages) == 0
 
 
-@pytest.mark.django_db()
+@pytest.mark.django_db
 def test_get_messages_by_user_invalid_user() -> None:
     """Test that no messages exists for invalid user."""
     bot = SQLiteDatabase()
@@ -218,7 +218,7 @@ def test_get_messages_by_user_invalid_user() -> None:
     assert messages == []
 
 
-@pytest.mark.django_db()  # type: ignore
+@pytest.mark.django_db  # type: ignore
 def test_get_messages_by_user_no_current_conversation(user_no_conversation: User) -> None:
     bot = SQLiteDatabase()
     messages = bot.get_messages_by_user(user_no_conversation.telegram_id)

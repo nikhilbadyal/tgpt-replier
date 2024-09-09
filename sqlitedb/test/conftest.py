@@ -1,4 +1,5 @@
 """Fixtures."""
+
 from datetime import timedelta
 from typing import Generator, no_type_check_decorator
 
@@ -9,13 +10,13 @@ from sqlitedb.models import Conversation, CurrentConversation, User, UserConvers
 from sqlitedb.utils import test_conversation
 
 
-@pytest.fixture()
+@pytest.fixture
 def user() -> Generator[User, None, None]:
     """Fixture for creating a user."""
     return User.objects.create(name="John", telegram_id=1234)
 
 
-@pytest.fixture()
+@pytest.fixture
 def conversation(user: User) -> Conversation:
     """Create a test conversation."""
     return Conversation.objects.create(
@@ -25,7 +26,7 @@ def conversation(user: User) -> Conversation:
     )
 
 
-@pytest.fixture()
+@pytest.fixture
 def user_with_messages() -> User:
     """Dummy user with messages for test cases."""
     user: User = User.objects.create(telegram_id=12345)
@@ -46,7 +47,7 @@ def user_with_messages() -> User:
     return user
 
 
-@pytest.fixture()
+@pytest.fixture
 def user_without_messages() -> User:
     """Dummy user without messages for test cases."""
     user: User = User.objects.create(telegram_id=23456)
@@ -56,14 +57,14 @@ def user_without_messages() -> User:
 
 
 @no_type_check_decorator
-@pytest.fixture()
+@pytest.fixture
 def user_no_conversation() -> User:
     """Dummy user without messages for test cases."""
     user: User = User.objects.create(telegram_id=34567)
     return user
 
 
-@pytest.fixture()
+@pytest.fixture
 def user_with_ordered_messages() -> User:
     """User with multiple messages."""
     user: User = User.objects.create(telegram_id=45678)

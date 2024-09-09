@@ -1,4 +1,5 @@
 """Test User Conversation."""
+
 import pytest
 from django.core.exceptions import ValidationError
 from django.db import IntegrityError
@@ -8,7 +9,7 @@ from sqlitedb.models import Conversation, User, UserConversations
 from sqlitedb.utils import test_message
 
 
-@pytest.mark.django_db()
+@pytest.mark.django_db
 def test_user_conversation_creation(user: User, conversation: Conversation) -> None:
     """Test creating a user conversation."""
     # Create a user conversation
@@ -34,7 +35,7 @@ def test_user_conversation_creation(user: User, conversation: Conversation) -> N
     user_conversation.delete()
 
 
-@pytest.mark.django_db()
+@pytest.mark.django_db
 def test_user_conversation_str(user: User, conversation: Conversation) -> None:
     """Test the string representation of a user conversation."""
     user_conversation = UserConversations.objects.create(
@@ -52,7 +53,7 @@ def test_user_conversation_str(user: User, conversation: Conversation) -> None:
     )
 
 
-@pytest.mark.django_db()
+@pytest.mark.django_db
 def test_user_conversation_from_bot(user: User, conversation: Conversation) -> None:
     """Test that the 'from_bot' attribute is required."""
     with pytest.raises(IntegrityError):
@@ -63,7 +64,7 @@ def test_user_conversation_from_bot(user: User, conversation: Conversation) -> N
         )
 
 
-@pytest.mark.django_db()
+@pytest.mark.django_db
 def test_user_conversation_message_required(
     user: User,
     conversation: Conversation,
@@ -78,7 +79,7 @@ def test_user_conversation_message_required(
         user_conversation.full_clean()  # Trigger the validation error
 
 
-@pytest.mark.django_db()
+@pytest.mark.django_db
 def test_user_conversation_message_date_auto_generated(
     user: User,
     conversation: Conversation,
@@ -93,7 +94,7 @@ def test_user_conversation_message_date_auto_generated(
     assert user_conversation.message_date is not None
 
 
-@pytest.mark.django_db()
+@pytest.mark.django_db
 def test_user_conversation_update(user: User, conversation: Conversation) -> None:
     """Test that we can update a user conversation."""
     user_conversation = UserConversations.objects.create(
@@ -107,7 +108,7 @@ def test_user_conversation_update(user: User, conversation: Conversation) -> Non
     assert user_conversation.message == "New message"
 
 
-@pytest.mark.django_db()
+@pytest.mark.django_db
 def test_user_conversation_delete_cascade(
     user: User,
     conversation: Conversation,

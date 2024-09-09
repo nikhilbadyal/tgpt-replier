@@ -1,4 +1,5 @@
 """Handle resetimages/resetmessages."""
+
 # Import necessary libraries and modules
 import re
 from re import Match
