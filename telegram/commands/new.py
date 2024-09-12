@@ -8,8 +8,6 @@ from loguru import logger
 from telethon import events
 
 # Import some helper functions
-from sqlitedb.utils import ErrorCodes
-from telegram.commands.strings import something_bad_occurred
 from telegram.commands.utils import SupportedCommands, get_user
 
 if TYPE_CHECKING:
@@ -48,14 +46,8 @@ async def handle_new_command(event: events.NewMessage.Event) -> None:
     if len(title) == 0:
         title = None
     # Call the function to initiate a new conversation
-    status = await sync_to_async(gpt.initiate_new_conversation)(telegram_user, title)
-
-    # Log the conversation ID
-    logger.debug(f"Initiated new conversation {status}")
+    await sync_to_async(gpt.initiate_new_conversation)(telegram_user, title)
 
     # Send a success message if the conversation was initiated successfully, otherwise send an error message
     success = "Initiated new conversation."
-    if isinstance(status, ErrorCodes):
-        await event.respond(something_bad_occurred)
-    else:
-        await event.respond(success)
+    await event.respond(success)

@@ -1,12 +1,10 @@
 """Handle start command."""
+
 # Import necessary libraries and modules
 from loguru import logger
 from telethon import TelegramClient, events
 
-from sqlitedb.utils import ErrorCodes
-
 # Import some helper functions
-from telegram.commands.strings import something_bad_occurred
 from telegram.commands.utils import SupportedCommands
 
 
@@ -45,11 +43,6 @@ async def handle_start_message(event: events.NewMessage.Event) -> None:
     # Generate a response based on the start message
     reply = gpt.reply_start(start_message)
 
-    # If the response is an integer, send a cleanup message instead
-    if isinstance(reply, ErrorCodes):
-        await event.respond(something_bad_occurred)
-    # Otherwise, extract the pun from the response and send it back to the user
-    else:
-        prefix_len = len(prefix)
-        result = reply[prefix_len:]
-        await event.respond(result)
+    prefix_len = len(prefix)
+    result = reply[prefix_len:]
+    await event.respond(result)

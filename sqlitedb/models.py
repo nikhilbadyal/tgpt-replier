@@ -1,6 +1,9 @@
 """Models."""
+
+from typing import Self
+
 from django.db import models
-from typing_extensions import Self
+from django_stubs_ext.db.models import TypedModelMeta
 
 from manage import init_django
 from sqlitedb.utils import UserStatus
@@ -63,7 +66,7 @@ class User(models.Model):
     # Use custom manager for this model
     objects = UserManager()
 
-    class Meta:
+    class Meta(TypedModelMeta):
         """Database table name."""
 
         db_table = "user"
@@ -73,8 +76,8 @@ class User(models.Model):
         return f"User(id={self.id}, name={self.name}, telegram_id={self.telegram_id}, status={self.status})"
 
 
-class ConversationManager(models.Manager):
-    """Manager for the Conversation model."""
+class ConversationManager(models.Manager):  # type: ignore[type-arg]
+    pass
 
 
 class Conversation(models.Model):
@@ -105,7 +108,7 @@ class Conversation(models.Model):
 
     objects = ConversationManager()
 
-    class Meta:
+    class Meta(TypedModelMeta):
         """Database table name."""
 
         db_table = "conversation"
@@ -155,7 +158,7 @@ class UserConversations(models.Model):
 
     objects = UserConversationsManager()
 
-    class Meta:
+    class Meta(TypedModelMeta):
         """Database table name."""
 
         db_table = "user_conversations"
@@ -196,7 +199,7 @@ class CurrentConversation(models.Model):
     # Use custom manager for this model
     objects = CurrentConversationManager()
 
-    class Meta:
+    class Meta(TypedModelMeta):
         """Database table name."""
 
         db_table = "current_conversation"
@@ -250,7 +253,7 @@ class UserImages(models.Model):
     # Use custom manager for this model
     objects = ImagesManager()
 
-    class Meta:
+    class Meta(TypedModelMeta):
         """Database table name."""
 
         db_table = "user_images"

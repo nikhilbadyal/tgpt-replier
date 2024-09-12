@@ -7,10 +7,8 @@ from asgiref.sync import sync_to_async
 from loguru import logger
 from telethon import events
 
-from sqlitedb.utils import ErrorCodes
-
 # Import some helper functions
-from telegram.commands.strings import no_input, something_bad_occurred
+from telegram.commands.strings import no_input
 from telegram.commands.utils import SupportedCommands, get_regex
 
 if TYPE_CHECKING:
@@ -41,12 +39,7 @@ async def handle_any_message(event: events.NewMessage.Event) -> None:
         if event.message.text.strip() and event.message.text.strip() != SupportedCommands.CHAT.value:
             # Generate a response based on the user and the message text
             message = await sync_to_async(gpt.chat)(user, event.message.text)
-            # If the response is an integer, send a cleanup message instead
-            if isinstance(message, ErrorCodes):
-                await event.respond(something_bad_occurred)
-            # Otherwise, send the response
-            else:
-                await event.respond(message)
+            await event.respond(message)
         # If the message doesn't contain text, send a cleanup message
         else:
             logger.debug("No text received in event.")

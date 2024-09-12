@@ -1,4 +1,5 @@
 """Added /switch command."""
+
 from asgiref.sync import sync_to_async
 from loguru import logger
 from telethon import TelegramClient, events

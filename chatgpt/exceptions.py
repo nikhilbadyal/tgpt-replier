@@ -1,0 +1,2 @@
+class InvalidChoiceError(Exception):
+    pass

@@ -1,4 +1,5 @@
 """Utility class."""
+
 import secrets
 import string
 from enum import Enum
@@ -38,3 +39,27 @@ def generate_random_string(length: int = 10) -> str:
     return "".join(secrets.choice(letters) for _ in range(length))
 
     # Return the result string
+
+
+dummy_response = {
+    "choices": [
+        {
+            "finish_reason": "stop",
+            "index": 0,
+            "message": {
+                "content": "The 2020 World Series was played in Texas at Globe Life Field in Arlington.",
+                "role": "assistant",
+            },
+            "logprobs": "null",
+        },
+    ],
+    "created": 1677664795,
+    "id": "chatcmpl-7QyqpwdfhqwajicIEznoc6Q47XAyW",
+    "model": "gpt-4o-mini",
+    "object": "chat.completion",
+    "usage": {
+        "completion_tokens": 17,
+        "prompt_tokens": 57,
+        "total_tokens": 74,
+    },
+}
