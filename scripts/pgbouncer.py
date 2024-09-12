@@ -1,4 +1,5 @@
 """Generate PgBouncer configuration file."""
+
 from __future__ import annotations
 
 import hashlib
@@ -28,8 +29,7 @@ def load_ini_with_env(file_path: str) -> str:
 
 
 def load_env_for_userlist() -> list[tuple[str, str]]:
-    """Load the PGBOUNCER_USER environment variable and return a list containing a single tuple of the username and
-    password.
+    """Load the PGBOUNCER_USER environment variable.
 
     :return: A list containing a single tuple with the username and password.
     """
@@ -57,7 +57,7 @@ def md5_hash_password(user: str, password: str) -> str:
     :param password: The database user's plain-text password.
     :return: The hashed password in the format 'md5<md5hash>'.
     """
-    md5hash = hashlib.md5(user.encode() + password.encode()).hexdigest()  # nosec
+    md5hash = hashlib.md5(user.encode() + password.encode()).hexdigest()  # noqa: S324
     return f"md5{md5hash}"
 
 
@@ -75,8 +75,7 @@ def generate_userlist_file(user_password_pairs: list[tuple[str, str]]) -> str:
 
 
 def main() -> None:
-    """Generate PgBouncer configuration files (pgbouncer.ini and userlist.txt) based on environment variables and a
-    sample INI file."""
+    """Generate PgBouncer configuration files (pgbouncer.ini and userlist.txt)."""
     # Read environment variables from the .env file."""
     base_dir = Path(__file__).resolve().parent.parent
     environ.Env.read_env(Path(base_dir, ".env"))

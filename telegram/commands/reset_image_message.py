@@ -1,4 +1,5 @@
 """Handle resetimages/resetmessages."""
+
 # Import necessary libraries and modules
 import re
 from re import Match
@@ -9,7 +10,6 @@ from loguru import logger
 from telethon import Button, TelegramClient, events
 
 # Import some helper functions
-from sqlitedb.utils import ErrorCodes
 from telegram.commands.strings import cleanup_success, ignore, something_bad_occurred
 from telegram.commands.utils import SupportedCommands, get_user
 
@@ -84,11 +84,7 @@ async def handle_reset_image_message_confirm_response(
             # Log the number of items deleted
             logger.debug(f"Removed {result} {request}")
 
-            # Send a success message if items were deleted, otherwise send an error message
-            if not isinstance(result, ErrorCodes):
-                await event.edit(cleanup_success)
-            else:
-                await event.edit(something_bad_occurred)
+            await event.edit(cleanup_success)
         else:
             await event.edit(something_bad_occurred)
     elif event.data == reset_no_data:

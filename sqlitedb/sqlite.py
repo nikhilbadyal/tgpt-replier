@@ -1,14 +1,14 @@
 """SQLite database to store messages."""
+
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any, TypeVar
+from typing import Any, Self, TypeVar
 
 from django.core.exceptions import ValidationError
 from django.core.paginator import EmptyPage, PageNotAnInteger, Paginator
 from django.db.models import Model, QuerySet
 from loguru import logger
 
-from chatgpt.chatgpt import ChatGPT
 from sqlitedb.models import (
     Conversation,
     CurrentConversation,
@@ -16,10 +16,6 @@ from sqlitedb.models import (
     UserConversations,
     UserImages,
 )
-from sqlitedb.utils import ErrorCodes
-
-if TYPE_CHECKING:
-    from typing_extensions import Self
 
 T = TypeVar("T", bound=Model)
 
@@ -27,7 +23,7 @@ T = TypeVar("T", bound=Model)
 class SQLiteDatabase(object):
     """SQLite database Object."""
 
-    def get_user(self: Self, telegram_id: int) -> User | ErrorCodes:
+    def get_user(self: Self, telegram_id: int) -> User:
         """Retrieve a User object from the database for a given user_id. If the user does not exist, create a new user.
 
         Args:
@@ -47,7 +43,7 @@ class SQLiteDatabase(object):
             logger.error(
                 f"Unable to get or create user: {e} because of {type(e).__name__}",
             )
-            return ErrorCodes.exceptions
+            raise
         else:
             if created:
                 logger.info(f"Created new user {user}")
@@ -89,7 +85,7 @@ class SQLiteDatabase(object):
         self: Self,
         user: User,
         message: str,
-    ) -> ErrorCodes | int:
+    ) -> int:
         """Retrieve a CurrentConversation object from the database given a User object.
 
         Args:
@@ -106,11 +102,10 @@ class SQLiteDatabase(object):
         except CurrentConversation.DoesNotExist:
             logger.info(f"No current conversation exists for user {user}")
             try:
-                openai_response = ChatGPT.send_text_completion_request(message)
-                if isinstance(openai_response, ErrorCodes):
-                    logger.debug("Unable to get chat title from OpenAI.")
-                    return ErrorCodes.exceptions
-                chat_title = openai_response["choices"][0]["text"]
+                from main import gpt
+
+                openai_response = gpt.send_text_completion_request(message)
+                chat_title = openai_response.choices[0].message.content
                 conversation = Conversation(user=user, title=chat_title)
                 conversation.save()
                 current_conversation = CurrentConversation(
@@ -121,7 +116,7 @@ class SQLiteDatabase(object):
                 conversation_id = int(current_conversation.conversation_id)
             except Exception as e:
                 logger.error(f"Unable to create new conversation {e}")
-                return ErrorCodes.exceptions
+                raise
         return conversation_id
 
     def _create_conversation(
@@ -129,7 +124,7 @@ class SQLiteDatabase(object):
         user_id: int,
         message: str,
         from_bot: bool,
-    ) -> ErrorCodes | None:
+    ) -> None:
         """Create a new Conversations object and save it to the database.
 
         Args:
@@ -143,30 +138,24 @@ class SQLiteDatabase(object):
         """
         try:
             user = self.get_user(user_id)
-            if isinstance(user, User):
-                conversation_id = self._get_current_conversation(user, message)
-                if isinstance(conversation_id, ErrorCodes):
-                    logger.error("Unable to get current conversation")
-                    return ErrorCodes.exceptions
-                conversation = UserConversations(
-                    user=user,
-                    message=message,
-                    from_bot=from_bot,
-                    conversation_id=conversation_id,
-                )
-                conversation.save()
-                return None
+            conversation_id = self._get_current_conversation(user, message)
+            conversation = UserConversations(
+                user=user,
+                message=message,
+                from_bot=from_bot,
+                conversation_id=conversation_id,
+            )
+            conversation.save()
             logger.debug("Unable to get user")
-            return ErrorCodes.exceptions
         except Exception as e:
             logger.error(f"Unable to save conversation {e}")
-            return ErrorCodes.exceptions
+            raise
 
     def insert_message_from_user(
         self: Self,
         message: str,
         user_id: int,
-    ) -> ErrorCodes | None:
+    ) -> None:
         """Insert a new conversation message into the database for a user.
 
         Args:
@@ -184,7 +173,7 @@ class SQLiteDatabase(object):
         self: Self,
         message: str,
         user_id: int,
-    ) -> ErrorCodes | None:
+    ) -> None:
         """Insert a new conversation message into the database from the GPT model.
 
         Args:
@@ -202,7 +191,7 @@ class SQLiteDatabase(object):
         image_caption: str,
         image_url: str,
         telegram_id: int,
-    ) -> ErrorCodes | None:
+    ) -> None:
         """Insert a new image record into the database for a user.
 
         Args:
@@ -225,9 +214,9 @@ class SQLiteDatabase(object):
             image.save()
         except Exception as e:
             logger.error(f"Unable to save image {e}")
-            return ErrorCodes.exceptions
+            raise
 
-    def delete_all_user_messages(self: Self, telegram_id: int) -> ErrorCodes | int:
+    def delete_all_user_messages(self: Self, telegram_id: int) -> int:
         """Delete all conversations for a user from the database.
 
         Args:
@@ -243,9 +232,9 @@ class SQLiteDatabase(object):
             return int(conversations.delete()[0])
         except Exception as e:
             logger.error(f"Error deleting {e}")
-            return ErrorCodes.exceptions
+            raise
 
-    def delete_all_user_images(self: Self, telegram_id: int) -> ErrorCodes | int:
+    def delete_all_user_images(self: Self, telegram_id: int) -> int:
         """Delete all images for a user from the database.
 
         Args:
@@ -261,12 +250,12 @@ class SQLiteDatabase(object):
             return int(images.delete()[0])
         except Exception as e:
             logger.error(f"Error deleting {e}")
-            return ErrorCodes.exceptions
+            raise
 
     def delete_all_user_data(
         self: Self,
         telegram_id: int,
-    ) -> tuple[ErrorCodes | int, ErrorCodes | int]:
+    ) -> tuple[int, int]:
         """Delete all conversations and images for a user from the database.
 
         Args:
@@ -286,9 +275,8 @@ class SQLiteDatabase(object):
         self: Self,
         telegram_id: int,
         title: str,
-    ) -> ErrorCodes | None:
-        """Initiates a new conversation for a user by creating a new Conversation object and a new CurrentConversation
-        object.
+    ) -> None:
+        """Initiates a new conversation for a user by creating a new Conversation object and a new CurrentConversation.
 
         Args:
             telegram_id (int): The ID of the user for which to start a new conversation.
@@ -307,12 +295,12 @@ class SQLiteDatabase(object):
             logger.error(
                 f"Validation error while saving conversation to the database: {ve}",
             )
-            return ErrorCodes.exceptions
+            raise
         except Exception as e:
             logger.error(
                 f"An error occurred while saving conversation to the database: {e}",
             )
-            return ErrorCodes.exceptions
+            raise
 
         try:
             current_conversation, created = CurrentConversation.objects.get_or_create(
@@ -322,24 +310,22 @@ class SQLiteDatabase(object):
             if not created:
                 current_conversation.conversation = conversation
                 current_conversation.save()
-            return None
         except ValidationError as ve:
             logger.error(
                 f"Validation error while getting or creating current conversation: {ve}",
             )
             conversation.delete()
-            return ErrorCodes.exceptions
+            raise
 
         except Exception as e:
             logger.error(
                 f"An error occurred while getting or creating current conversation: {e}",
             )
             conversation.delete()
-            return ErrorCodes.exceptions
+            raise
 
     def initiate_empty_new_conversation(self: Self, telegram_id: int) -> None:
-        """Initiates a new empty conversation for a user by creating a new Conversation object and a new
-        CurrentConversation object.
+        """Initiates a new empty conversation for a user.
 
         Args:
             telegram_id (int): The ID of the user for which to start a new conversation.
@@ -416,7 +402,7 @@ class SQLiteDatabase(object):
         self: Self,
         conversation_id: int,
         user: User,
-    ) -> Conversation | None:
+    ) -> Conversation:
         """Get the Conversation object by its ID.
 
         Args:
@@ -427,15 +413,11 @@ class SQLiteDatabase(object):
         -------
             Optional[Conversation]: The conversation object if it exists, otherwise None.
         """
-        try:
-            conversation = Conversation.objects.only("id", "title").get(
-                id=conversation_id,
-                user=user,
-            )
-            logger.debug(f"Got {conversation}")
-            return conversation
-        except Conversation.DoesNotExist:
-            return None
+        conversation: Conversation = Conversation.objects.only("id", "title").get(
+            id=conversation_id,
+            user=user,
+        )
+        return conversation
 
     def set_active_conversation(self: Self, user: User, conversation: Conversation) -> None:
         """Set the active conversation for a user.
@@ -445,7 +427,7 @@ class SQLiteDatabase(object):
             conversation (Conversation): The conversation to be set as active.
             Pass None to unset the active conversation.
         """
-        current_conversation, created = CurrentConversation.objects.get_or_create(
+        current_conversation, _ = CurrentConversation.objects.get_or_create(
             user=user,
         )
         current_conversation.conversation = conversation

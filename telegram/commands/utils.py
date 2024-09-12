@@ -1,4 +1,5 @@
 """Utility functions."""
+
 from __future__ import annotations
 
 from enum import Enum
@@ -7,9 +8,10 @@ from typing import TYPE_CHECKING, Any
 from loguru import logger
 
 if TYPE_CHECKING:
+    from typing import Self
+
     from telethon import events
     from telethon.tl.types import User
-    from typing_extensions import Self
 
 PAGE_SIZE = 10  # Number of conversations per page
 
@@ -77,7 +79,7 @@ def get_regex() -> str:
         str: A regex pattern as a string.
     """
     # Exclude any message that starts with one of the supported commands using negative lookahead
-    return r"^(?!(%s))[^/].*" % "|".join(SupportedCommands.get_values())
+    return r"^(?!({}))[^/].*".format("|".join(SupportedCommands.get_values()))
 
 
 class UserSettings(Enum):
@@ -85,7 +87,7 @@ class UserSettings(Enum):
 
     PAGE_SIZE = "page_size", "The number of conversations displayed per page."
 
-    def __new__(cls, *args: Any, **kwds: Any) -> UserSettings:
+    def __new__(cls, *args: Any, **kwargs: Any) -> UserSettings:  # noqa: ARG003
         obj = object.__new__(cls)
         obj._value_ = args[0]
         return obj

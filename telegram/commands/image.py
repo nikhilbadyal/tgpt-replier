@@ -1,4 +1,5 @@
 """Handle Image Command."""
+
 # Import necessary libraries and modules
 import requests
 from asgiref.sync import sync_to_async
@@ -6,10 +7,8 @@ from loguru import logger
 from telethon import events
 from telethon.tl.types import User
 
-from sqlitedb.utils import ErrorCodes
-
 # Import some helper functions
-from telegram.commands.strings import no_input, something_bad_occurred
+from telegram.commands.strings import no_input
 from telegram.commands.utils import SupportedCommands, get_user
 
 
@@ -70,9 +69,6 @@ async def handle_image_command(event: events.NewMessage.Event) -> None:
     # Generate an image URL based on the query
     if result:
         url = await sync_to_async(gpt.image_gen)(telegram_user, result)
-        if isinstance(url, ErrorCodes):
-            await event.respond(something_bad_occurred)
-
         # Send the image to the user
         await send_image_from_url(event, telegram_user, url, result)
     else:

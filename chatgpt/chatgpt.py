@@ -1,18 +1,19 @@
 """Auth Open API."""
+
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Self
 
 import openai
 from loguru import logger
+from openai import OpenAI
 
-from chatgpt.utils import DataType, UserType, generate_random_string
-from sqlitedb.utils import ErrorCodes
+from chatgpt.exceptions import InvalidChoiceError
+from chatgpt.utils import DataType, UserType, dummy_response
 
 if TYPE_CHECKING:
-    from openai.openai_object import OpenAIObject
+    from openai.types.chat import ChatCompletion
     from telethon.tl.types import User
-    from typing_extensions import Self
 
 
 class ChatGPT(object):
@@ -20,13 +21,13 @@ class ChatGPT(object):
 
     def __init__(self: Self) -> None:
         self.message_history: dict[str, list[dict[str, str]]] = {}
-        self._auth()
-
-    def _auth(self: Self) -> None:
-        """Auth Open API."""
         from main import env
 
-        openai.api_key = env.str("GPT_KEY")
+        self.model = env.str("GPT_MODEL", "gpt-4o")
+        self.client = OpenAI(
+            api_key=env.str("GPT_KEY"),
+            base_url=env.str("GPT_URL", "https://api.openai.com/v1"),
+        )
 
     def build_message(self: Self, result: dict[dict[str, str], str]) -> list[dict[str, str]]:
         """Build Open API message."""
@@ -44,118 +45,97 @@ class ChatGPT(object):
     def send_request(
         self: Self,
         messages: list[dict[str, str]],
-    ) -> OpenAIObject | dict[str, list[dict[str, dict[str, str]]]] | ErrorCodes:
+    ) -> ChatCompletion:
         """Send a request to OpenAI."""
         try:
             from main import env
 
             if env.bool("PROD", False):
                 logger.debug("Sent chat completion request to OPENAI")
-                response: OpenAIObject = openai.ChatCompletion.create(
-                    model="gpt-3.5-turbo",
+                response: ChatCompletion = self.client.chat.completions.create(
+                    model=self.model,
                     messages=messages,
                     timeout=10,
                 )
                 logger.debug("Got chat completion response fromm open AI")
                 return response
             logger.debug("Returned patched chat completion response from open AI")
-            return {
-                "choices": [
-                    {
-                        "message": {
-                            "content": f"Message: {generate_random_string(length=20)}",
-                        },
-                    },
-                ],
-            }
-
+            return dummy_response
         except Exception as e:
             logger.error(f"Unable to get response from OpenAI {e}")
-            return ErrorCodes.exceptions
+            raise
 
-    @staticmethod
     def send_text_completion_request(
-        messages: str,
-    ) -> dict[str, list[dict[str, str]]] | ErrorCodes:
+        self,
+        message: str,
+    ) -> ChatCompletion:
         """Send a Text completion request to OpenAI."""
         try:
             from main import env
 
             if env.bool("PROD", False):
                 logger.debug("Sent text completion request to OPENAI")
-                response: OpenAIObject = openai.Completion.create(
-                    model="text-davinci-003",
-                    temperature=0,
-                    prompt=messages,
+                system = [{"role": "system", "content": "You are Summary AI."}]
+                user = [
+                    {
+                        "role": "user",
+                        "content": f"If this is answer what will be the question(under 250 words):\n\n{message}",
+                    },
+                ]
+                response: ChatCompletion = self.client.chat.completions.create(
+                    model=self.model,
+                    messages=system + user,
                     timeout=10,
                 )
                 logger.debug("Got text completion response fromm open AI")
-                return response.json()
+                return response
             logger.debug("Returned patched text completion response from open AI")
-            return {
-                "choices": [
-                    {
-                        "text": f"Title: {generate_random_string(length=20)}",
-                    },
-                ],
-            }
+            return dummy_response
 
         except Exception as e:
             logger.error(f"Unable to get response from OpenAI {e}")
-            return ErrorCodes.exceptions
+            raise
 
-    def reply_start(self: Self, message: str) -> str | ErrorCodes:
+    def reply_start(self: Self, message: str) -> str:
         """Reply to start message."""
         messages = [
             {"role": "system", "content": "You are a helpful assistant."},
             {"role": "user", "content": message},
         ]
         openapi_response = self.send_request(messages)
-        if isinstance(openapi_response, ErrorCodes):
-            return openapi_response
-        return str(openapi_response["choices"][0]["message"]["content"])
+        return str(openapi_response.choices[0].message.content)
 
-    def chat(self: Self, user: User, message: str) -> str | ErrorCodes:
+    def chat(self: Self, user: User, message: str) -> str:
         """Chat Open API."""
         from main import db
 
-        response = db.insert_message_from_user(message, user.id)
-        if isinstance(response, ErrorCodes):
-            return response
+        db.insert_message_from_user(message, user.id)
         messages = db.get_messages_by_user(user.id)
-        if isinstance(response, ErrorCodes):
-            return response
         self.message_history[user.username] = self.build_message(messages)
         openapi_response = self.send_request(self.message_history[user.username])
-        if isinstance(openapi_response, ErrorCodes):
-            return openapi_response
-        reply = str(openapi_response["choices"][0]["message"]["content"])
-        response = db.insert_message_from_gpt(reply, user.id)
-        if isinstance(response, ErrorCodes):
-            return response
+        reply = str(openapi_response.choices[0].message.content)
+        db.insert_message_from_gpt(reply, user.id)
         self.message_history[user.username].append(
             {"role": UserType.ASSISTANT.value, "content": reply},
         )
         return reply
 
-    def image_gen(self: Self, telegram_user: User, message: str) -> str | ErrorCodes:
+    def image_gen(self: Self, telegram_user: User, message: str) -> str:
         """Generate an image from the text."""
         response = openai.Image.create(prompt=message, n=1, size="512x512")
         image_url = str(response["data"][0]["url"])
         from main import db
 
-        response = db.insert_images_from_gpt(message, image_url, telegram_user.id)
-        if isinstance(response, ErrorCodes):
-            return response
+        db.insert_images_from_gpt(message, image_url, telegram_user.id)
         return image_url
 
-    def _clean_up_user_messages(self: Self, telegram_user: User) -> ErrorCodes | int:
+    def _clean_up_user_messages(self: Self, telegram_user: User) -> int:
         """Delete all user's message data."""
         from main import db
 
         return db.delete_all_user_messages(telegram_user.id)
 
-    def _clean_up_user_images(self: Self, user: User) -> ErrorCodes | int:
+    def _clean_up_user_images(self: Self, user: User) -> int:
         """Delete all user's image data."""
         from main import db
 
@@ -165,24 +145,23 @@ class ChatGPT(object):
         self: Self,
         data: str,
         telegram_user: User,
-    ) -> ErrorCodes | int | tuple[int, int] | tuple[ErrorCodes | int, ErrorCodes | int]:
+    ) -> int | tuple[int, int]:
         """Delete all for a user data."""
         from main import db
 
         if data == DataType.MESSAGES.value:
             return self._clean_up_user_messages(telegram_user)
-        elif data == DataType.IMAGES.value:
+        if data == DataType.IMAGES.value:
             return self._clean_up_user_images(telegram_user)
-        elif data == DataType.ALL.value:
+        if data == DataType.ALL.value:
             return db.delete_all_user_data(telegram_user.id)
-        logger.error(f"Not a valid choice {data}")
-        return ErrorCodes.exceptions
+        raise InvalidChoiceError(data)
 
     def initiate_new_conversation(
         self: Self,
         telegram_user: User,
         title: str,
-    ) -> ErrorCodes | None:
+    ) -> None:
         """Initiate a new conversation."""
         from main import db
 

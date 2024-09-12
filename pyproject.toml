@@ -1,28 +1,41 @@
 [tool.ruff]
 line-length = 120
-select = ["ALL"]
-ignore = [
-    "ANN401", #Disallow Any
-    "D401", #Imperative mood
-    "RUF012", #ignore till https://github.com/astral-sh/ruff/issues/5243
-    "UP004", #useless-object-inheritance
-    "PGH003", #useless-object-inheritance
-    "D205", #blank line required between summary line and description
-    "FBT003", # Boolean positional value in function call
-    "FBT001", # Boolean positional value in function call
-    "BLE001", # Do not catch blind exception: `Exception`
-
-]
-target-version = "py38"
+target-version = "py311"
 fix = true
 show-fixes = true
-[tool.ruff.pydocstyle]
+[tool.ruff.lint]
+select = [ "ALL"]
+ignore = [
+    "D401",
+    "ANN401",
+    "S603",
+    "S607",
+    "ARG002", #unused-method-argument
+    "PTH122", #os-path-splitext
+    "TRY301", #raise-within-try
+    "PERF203", #try-except-in-loop
+    "UP004", #useless-object-inheritance
+    "PLR0911", #too many returns
+    "S310", # Audit URL open for permitted schemes.
+    "FBT003", # Audit URL open for permitted schemes.
+    "BLE001", # Audit URL open for permitted schemes.
+    "TRY300", # Audit URL open for permitted schemes.
+    "D102", # Audit URL open for permitted schemes.
+    "D100", # Audit URL open for permitted schemes.
+    "D101", # Audit URL open for permitted schemes.
+    "RUF012", # Audit URL open for permitted schemes.
+    "PYI034", # Audit URL open for permitted schemes.
+    "D104", # Audit URL open for permitted schemes.
+    "ASYNC210", # Audit URL open for permitted schemes.
+    "PLR2004", # Audit URL open for permitted schemes.
+    "DTZ005", # Audit URL open for permitted schemes.
+    "FBT001", # Audit URL open for permitted schemes.
+    "PGH003", # Audit URL open for permitted schemes.
+]
+[tool.ruff.lint.pydocstyle]
 convention = "numpy"
-
-[tool.ruff.per-file-ignores]
+[tool.ruff.lint.per-file-ignores]
 "test**.py" = ["S101","SLF001","PT019","S311","D102"]
-"model**.py" = ["A003"]
-
 
 [tool.docformatter]
 recursive = true

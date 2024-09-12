@@ -1,10 +1,10 @@
 """Reply to messages."""
 
 import sys
+from typing import Self
 
 from loguru import logger
 from telethon import TelegramClient
-from typing_extensions import Self
 
 from telegram.commands import general, image, new
 from telegram.commands.chat import add_chat_handler

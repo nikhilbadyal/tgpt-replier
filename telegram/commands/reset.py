@@ -1,4 +1,5 @@
 """Handle Reset Command."""
+
 # Import necessary libraries and modules
 from typing import TYPE_CHECKING
 
@@ -7,8 +8,7 @@ from loguru import logger
 from telethon import Button, TelegramClient, events
 
 # Import some helper functions
-from sqlitedb.utils import ErrorCodes
-from telegram.commands.strings import cleanup_success, ignore, something_bad_occurred
+from telegram.commands.strings import cleanup_success, ignore
 from telegram.commands.utils import SupportedCommands, get_user
 
 if TYPE_CHECKING:
@@ -53,23 +53,13 @@ async def handle_reset_confirm_response(
 
         # Get the user associated with the message
         telegram_user: User = await get_user(event)
-        # Call the function to clean up user data
-        num_conv_deleted, num_img_deleted = await sync_to_async(gpt.clean_up_user_data)(
+
+        await sync_to_async(gpt.clean_up_user_data)(
             SupportedCommands.RESET.value,
             telegram_user,
         )
 
-        # Log the number of items deleted
-        logger.debug(f"Removed {num_conv_deleted} convo and {num_img_deleted} images")
-
-        # Send a success message if items were deleted, otherwise send an error message
-        if not isinstance(num_conv_deleted, ErrorCodes) and not isinstance(
-            num_img_deleted,
-            ErrorCodes,
-        ):
-            await event.edit(cleanup_success)
-        else:
-            await event.edit(something_bad_occurred)
+        await event.edit(cleanup_success)
     elif event.data == reset_no_data:
         await event.edit(ignore)
 

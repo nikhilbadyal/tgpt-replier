@@ -1,4 +1,5 @@
 """Restart on code changes."""
+
 from __future__ import annotations
 
 import os
@@ -11,10 +12,10 @@ from watchdog.events import FileModifiedEvent, FileSystemEventHandler
 from watchdog.observers import Observer
 
 if TYPE_CHECKING:
-    from typing_extensions import Self
+    from typing import Self
 
 
-class MyHandler(FileSystemEventHandler):
+class MyHandler(FileSystemEventHandler):  # type: ignore
     """Watch Handler."""
 
     def __init__(self: Self, excluded_dir: list[str]) -> None:
