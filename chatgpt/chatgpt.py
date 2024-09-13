@@ -62,7 +62,7 @@ class ChatGPT(object):
             logger.debug("Returned patched chat completion response from open AI")
             return dummy_response
         except Exception as e:
-            logger.error(f"Unable to get response from OpenAI {e}")
+            logger.exception(f"Unable to get response from OpenAI {e}")
             raise
 
     def send_text_completion_request(
@@ -93,7 +93,7 @@ class ChatGPT(object):
             return dummy_response
 
         except Exception as e:
-            logger.error(f"Unable to get response from OpenAI {e}")
+            logger.exception(f"Unable to get response from OpenAI {e}")
             raise
 
     def reply_start(self: Self, message: str) -> str:

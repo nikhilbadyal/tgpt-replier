@@ -40,7 +40,7 @@ class SQLiteDatabase(object):
                 defaults={"name": f"User {telegram_id}"},
             )
         except Exception as e:
-            logger.error(
+            logger.exception(
                 f"Unable to get or create user: {e} because of {type(e).__name__}",
             )
             raise
@@ -71,7 +71,7 @@ class SQLiteDatabase(object):
                 user=user,
             )
         except CurrentConversation.DoesNotExist:
-            logger.error(f"No current conversation found for user with ID {user}.")
+            logger.exception(f"No current conversation found for user with ID {user}.")
             return []
 
         messages = (
@@ -115,7 +115,7 @@ class SQLiteDatabase(object):
                 current_conversation.save()
                 conversation_id = int(current_conversation.conversation_id)
             except Exception as e:
-                logger.error(f"Unable to create new conversation {e}")
+                logger.exception(f"Unable to create new conversation {e}")
                 raise
         return conversation_id
 
@@ -146,9 +146,8 @@ class SQLiteDatabase(object):
                 conversation_id=conversation_id,
             )
             conversation.save()
-            logger.debug("Unable to get user")
         except Exception as e:
-            logger.error(f"Unable to save conversation {e}")
+            logger.exception(f"Unable to save conversation {e}")
             raise
 
     def insert_message_from_user(
@@ -213,7 +212,7 @@ class SQLiteDatabase(object):
             )
             image.save()
         except Exception as e:
-            logger.error(f"Unable to save image {e}")
+            logger.exception(f"Unable to save image {e}")
             raise
 
     def delete_all_user_messages(self: Self, telegram_id: int) -> int:
@@ -231,7 +230,7 @@ class SQLiteDatabase(object):
             conversations = Conversation.objects.filter(user=user)
             return int(conversations.delete()[0])
         except Exception as e:
-            logger.error(f"Error deleting {e}")
+            logger.exception(f"Error deleting {e}")
             raise
 
     def delete_all_user_images(self: Self, telegram_id: int) -> int:
@@ -249,7 +248,7 @@ class SQLiteDatabase(object):
             images = UserImages.objects.filter(user=user)
             return int(images.delete()[0])
         except Exception as e:
-            logger.error(f"Error deleting {e}")
+            logger.exception(f"Error deleting {e}")
             raise
 
     def delete_all_user_data(
@@ -292,12 +291,12 @@ class SQLiteDatabase(object):
         try:
             conversation.save()
         except ValidationError as ve:
-            logger.error(
+            logger.exception(
                 f"Validation error while saving conversation to the database: {ve}",
             )
             raise
         except Exception as e:
-            logger.error(
+            logger.exception(
                 f"An error occurred while saving conversation to the database: {e}",
             )
             raise
@@ -311,14 +310,14 @@ class SQLiteDatabase(object):
                 current_conversation.conversation = conversation
                 current_conversation.save()
         except ValidationError as ve:
-            logger.error(
+            logger.exception(
                 f"Validation error while getting or creating current conversation: {ve}",
             )
             conversation.delete()
             raise
 
         except Exception as e:
-            logger.error(
+            logger.exception(
                 f"An error occurred while getting or creating current conversation: {e}",
             )
             conversation.delete()

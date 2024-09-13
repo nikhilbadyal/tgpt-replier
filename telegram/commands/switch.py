@@ -4,7 +4,7 @@ from asgiref.sync import sync_to_async
 from loguru import logger
 from telethon import TelegramClient, events
 
-from sqlitedb.models import User
+from sqlitedb.models import User, Conversation
 from telegram.commands.utils import SupportedCommands
 
 
@@ -61,9 +61,9 @@ async def switch_conversation(
     from main import db
 
     # Check if the specified conversation belongs to the user
-    conversation = await sync_to_async(db.get_conversation)(conversation_id, user)
-
-    if conversation is None:
+    try:
+        conversation = await sync_to_async(db.get_conversation)(conversation_id, user)
+    except Conversation.DoesNotExist:
         await event.reply("The specified conversation does not exists.")
         return
 
