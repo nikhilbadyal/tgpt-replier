@@ -4,7 +4,7 @@ from asgiref.sync import sync_to_async
 from loguru import logger
 from telethon import TelegramClient, events
 
-from sqlitedb.models import User, Conversation
+from sqlitedb.models import Conversation, User
 from telegram.commands.utils import SupportedCommands
 
 
