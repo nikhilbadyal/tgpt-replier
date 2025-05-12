@@ -20,17 +20,17 @@ PAGE_SIZE = 10  # Number of conversations per page
 class SupportedCommands(Enum):
     """Enum for supported commands."""
 
-    START: str = "/start"
-    IMAGE: str = "/image"
-    RESET_MESSAGES: str = "/resetmessages"
-    RESET_IMAGES: str = "/resetimages"
-    RESET: str = "/reset"
-    NEW: str = "/new"
-    LIST: str = "/list"
-    SETTINGS: str = "/settings"
-    SWITCH: str = "/switch"
-    CHAT: str = "/chat"
-    PRINT: str = "/print"
+    START = "/start"
+    IMAGE = "/image"
+    RESET_MESSAGES = "/resetmessages"
+    RESET_IMAGES = "/resetimages"
+    RESET = "/reset"
+    NEW = "/new"
+    LIST = "/list"
+    SETTINGS = "/settings"
+    SWITCH = "/switch"
+    CHAT = "/chat"
+    PRINT = "/print"
 
     @classmethod
     def get_values(cls) -> list[str]:
@@ -87,7 +87,7 @@ class UserSettings(Enum):
 
     PAGE_SIZE = "page_size", "The number of conversations displayed per page."
 
-    def __new__(cls, *args: Any, **kwargs: Any) -> UserSettings:  # noqa: ARG003
+    def __new__(cls, *args: Any, **_: Any) -> UserSettings:
         obj = object.__new__(cls)
         obj._value_ = args[0]
         return obj
