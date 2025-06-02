@@ -113,7 +113,7 @@ class SQLiteDatabase(object):
                     conversation=conversation,
                 )
                 current_conversation.save()
-                conversation_id = int(current_conversation.conversation_id)
+                conversation_id = int(current_conversation.conversation_id)  # type: ignore [attr-defined]
             except Exception as e:
                 logger.exception(f"Unable to create new conversation {e}")
                 raise
