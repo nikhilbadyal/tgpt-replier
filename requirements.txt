@@ -15,7 +15,7 @@ pytest-mock==3.14.0
 pytest-sugar==1.0.0 # https://github.com/Frozenball/pytest-sugar
 pytest-xdist==3.6.1
 python-dotenv==1.1.0
-requests==2.32.3
+requests==2.32.4
 telethon==1.40.0 #https://github.com/LonamiWebs/Telethon
 typing-extensions==4.13.2
 watchdog==6.0.0 #https://github.com/gorakhargosh/watchdog
