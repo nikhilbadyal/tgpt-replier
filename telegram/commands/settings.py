@@ -43,7 +43,7 @@ async def handle_settings_current_settings(
         event (CallbackQuery.Event): The callback query event.
     """
     await event.answer()
-    from main import db
+    from main import db  # noqa: PLC0415
 
     response = "**Current settings**:\n\n"
     telegram_id = event.query.user_id
@@ -64,7 +64,7 @@ async def handle_settings_command(event: events.NewMessage.Event) -> None:
     Args:
         event (NewMessage.Event): The new message event.
     """
-    from main import db
+    from main import db  # noqa: PLC0415
 
     # Extract the setting name and new value from the input message
     parts = event.message.text.split()

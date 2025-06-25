@@ -49,7 +49,7 @@ async def handle_image_command(event: events.NewMessage.Event) -> None:
         None: This function doesn't return anything.
     """
     # Import the main function for generating image URLs
-    from main import gpt
+    from main import gpt  # noqa: PLC0415
 
     # Log that an image request has been received
     logger.debug("Received image request")

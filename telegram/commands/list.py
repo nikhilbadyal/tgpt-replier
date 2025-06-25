@@ -45,7 +45,7 @@ async def send_paginated_conversations(
     -------
         Tuple[str, List]: A tuple containing the response message and the list of buttons.
     """
-    from main import db
+    from main import db  # noqa: PLC0415
 
     # Fetch user settings
     user = await sync_to_async(db.get_user)(telegram_id)

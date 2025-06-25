@@ -27,7 +27,7 @@ async def handle_new_command(event: events.NewMessage.Event) -> None:
         None: This function doesn't return anything.
     """
     # Import the main function for initiating a new conversation
-    from main import gpt
+    from main import gpt  # noqa: PLC0415
 
     # Log that a request has been received to initiate a new conversation
     logger.debug("Received request to initiate new conversation")

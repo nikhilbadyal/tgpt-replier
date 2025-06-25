@@ -64,7 +64,7 @@ async def handle_reset_image_message_confirm_response(
     logger.debug("Received reset image/message callback")
     if event.data == reset_yes_data:
         # Import the main function for cleaning up user data
-        from main import gpt
+        from main import gpt  # noqa: PLC0415
 
         # Get the user associated with the message
         telegram_user: User = await get_user(event)

@@ -38,7 +38,7 @@ async def handle_start_message(event: events.NewMessage.Event) -> None:
     logger.debug("Received pun request")
 
     # Import the main function for generating responses
-    from main import gpt
+    from main import gpt  # noqa: PLC0415
 
     # Generate a response based on the start message
     reply = gpt.reply_start(start_message)

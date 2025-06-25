@@ -102,7 +102,7 @@ class SQLiteDatabase(object):
         except CurrentConversation.DoesNotExist:
             logger.info(f"No current conversation exists for user {user}")
             try:
-                from main import gpt
+                from main import gpt  # noqa: PLC0415
 
                 openai_response = gpt.send_text_completion_request(message)
                 chat_title = openai_response.choices[0].message.content
