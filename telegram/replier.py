@@ -26,7 +26,7 @@ class Telegram(object):
         Args:
             session_file (str): The path to the session file to use for connecting to the Telegram API.
         """
-        from main import env
+        from main import env  # noqa: PLC0415
 
         # Create a new TelegramClient instance with the given session file and API credentials
         self.client: TelegramClient = TelegramClient(

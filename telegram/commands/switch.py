@@ -39,7 +39,7 @@ async def handle_switch_command(event: events.NewMessage.Event) -> None:
         return
 
     telegram_id = event.message.sender_id
-    from main import db
+    from main import db  # noqa: PLC0415
 
     user = await sync_to_async(db.get_user)(telegram_id=telegram_id)
     await switch_conversation(event, user, conversation_id)
@@ -58,7 +58,7 @@ async def switch_conversation(
         user (User): The user object.
         conversation_id (int): The ID of the conversation to switch to.
     """
-    from main import db
+    from main import db  # noqa: PLC0415
 
     # Check if the specified conversation belongs to the user
     try:

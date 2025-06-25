@@ -28,7 +28,7 @@ async def handle_any_message(event: events.NewMessage.Event) -> None:
         None: This function doesn't return anything.
     """
     # Import the main function for generating responses
-    from main import gpt
+    from main import gpt  # noqa: PLC0415
 
     # Log that a request has been received
     logger.debug("Received request in general handler")

@@ -21,7 +21,7 @@ class ChatGPT(object):
 
     def __init__(self: Self) -> None:
         self.message_history: dict[str, list[dict[str, str]]] = {}
-        from main import env
+        from main import env  # noqa: PLC0415
 
         self.model = env.str("GPT_MODEL", "gpt-4o")
         self.client = OpenAI(
@@ -48,7 +48,7 @@ class ChatGPT(object):
     ) -> ChatCompletion:
         """Send a request to OpenAI."""
         try:
-            from main import env
+            from main import env  # noqa: PLC0415
 
             if env.bool("PROD", False):
                 logger.debug("Sent chat completion request to OPENAI")
@@ -71,7 +71,7 @@ class ChatGPT(object):
     ) -> ChatCompletion:
         """Send a Text completion request to OpenAI."""
         try:
-            from main import env
+            from main import env  # noqa: PLC0415
 
             if env.bool("PROD", False):
                 logger.debug("Sent text completion request to OPENAI")
@@ -107,7 +107,7 @@ class ChatGPT(object):
 
     def chat(self: Self, user: User, message: str) -> str:
         """Chat Open API."""
-        from main import db
+        from main import db  # noqa: PLC0415
 
         db.insert_message_from_user(message, user.id)
         messages = db.get_messages_by_user(user.id)
@@ -124,20 +124,20 @@ class ChatGPT(object):
         """Generate an image from the text."""
         response = openai.Image.create(prompt=message, n=1, size="512x512")
         image_url = str(response["data"][0]["url"])
-        from main import db
+        from main import db  # noqa: PLC0415
 
         db.insert_images_from_gpt(message, image_url, telegram_user.id)
         return image_url
 
     def _clean_up_user_messages(self: Self, telegram_user: User) -> int:
         """Delete all user's message data."""
-        from main import db
+        from main import db  # noqa: PLC0415
 
         return db.delete_all_user_messages(telegram_user.id)
 
     def _clean_up_user_images(self: Self, user: User) -> int:
         """Delete all user's image data."""
-        from main import db
+        from main import db  # noqa: PLC0415
 
         return db.delete_all_user_images(user.id)
 
@@ -147,7 +147,7 @@ class ChatGPT(object):
         telegram_user: User,
     ) -> int | tuple[int, int]:
         """Delete all for a user data."""
-        from main import db
+        from main import db  # noqa: PLC0415
 
         if data == DataType.MESSAGES.value:
             return self._clean_up_user_messages(telegram_user)
@@ -163,7 +163,7 @@ class ChatGPT(object):
         title: str,
     ) -> None:
         """Initiate a new conversation."""
-        from main import db
+        from main import db  # noqa: PLC0415
 
         if title:
             logger.debug("Initializing new conversation with title")

@@ -55,7 +55,7 @@ async def display_paginated_messages(
     """
     # Retrieve UserConversations queryset filtered by the given conversation_id
     # Fetch user settings
-    from main import db
+    from main import db  # noqa: PLC0415
 
     user = await sync_to_async(db.get_user)(telegram_id)
     user_settings = user.settings
