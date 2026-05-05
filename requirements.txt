@@ -13,7 +13,7 @@ pytest-loguru==0.4.0
 pytest-md==0.2.0
 pytest-mock==3.14.0
 pytest-sugar==1.0.0 # https://github.com/Frozenball/pytest-sugar
-pytest-xdist==3.6.1
+pytest-xdist==3.8.0
 python-dotenv==1.2.2
 requests==2.33.0
 telethon==1.40.0 #https://github.com/LonamiWebs/Telethon
