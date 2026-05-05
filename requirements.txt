@@ -17,5 +17,5 @@ pytest-xdist==3.6.1
 python-dotenv==1.2.2
 requests==2.33.0
 telethon==1.40.0 #https://github.com/LonamiWebs/Telethon
-typing-extensions==4.13.2
+typing-extensions==4.15.0
 watchdog==6.0.0 #https://github.com/gorakhargosh/watchdog
