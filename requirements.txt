@@ -4,7 +4,7 @@ environs==14.1.1
 loguru==0.7.3
 openai==1.78.1
 pre-commit==4.2.0
-psycopg2-binary==2.9.10 # https://github.com/psycopg/psycopg2
+psycopg2-binary==2.9.12 # https://github.com/psycopg/psycopg2
 pytest-cov==6.1.1 #https://github.com/pytest-dev/pytest-cov
 pytest-django==4.11.1
 pytest-emoji==0.2.0
