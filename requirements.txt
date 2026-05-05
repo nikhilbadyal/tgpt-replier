@@ -8,7 +8,7 @@ psycopg2-binary==2.9.12 # https://github.com/psycopg/psycopg2
 pytest-cov==6.1.1 #https://github.com/pytest-dev/pytest-cov
 pytest-django==4.11.1
 pytest-emoji==0.2.0
-pytest-html==4.1.1  #https://github.com/pytest-dev/pytest-html
+pytest-html==4.2.0  #https://github.com/pytest-dev/pytest-html
 pytest-loguru==0.4.0
 pytest-md==0.2.0
 pytest-mock==3.14.0
