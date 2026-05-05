@@ -2,7 +2,7 @@ django==5.2.13
 django-environ==0.12.0
 environs==14.1.1
 loguru==0.7.3
-openai==1.78.1
+openai==1.109.1
 pre-commit==4.2.0
 psycopg2-binary==2.9.12 # https://github.com/psycopg/psycopg2
 pytest-cov==6.1.1 #https://github.com/pytest-dev/pytest-cov
