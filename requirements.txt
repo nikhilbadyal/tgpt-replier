@@ -1,6 +1,6 @@
 django==6.0.7
 django-environ==0.14.0
-environs==15.0.1
+environs==15.1.0
 loguru==0.7.3
 openai==2.49.0
 pre-commit==4.6.1
