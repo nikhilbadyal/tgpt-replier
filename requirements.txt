@@ -1,4 +1,4 @@
-django==6.0.8
+django==6.1
 django-environ==0.14.0
 environs==15.1.0
 loguru==0.7.3
